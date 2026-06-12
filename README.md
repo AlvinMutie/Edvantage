@@ -1,4 +1,4 @@
-# 🎓 EdVantage - Student Performance Monitoring & Intervention System
+# EdVantage - Student Performance Monitoring & Intervention System
 
 **EdVantage** is an intelligent student performance tracking platform that leverages Machine Learning to identify at-risk students early and enable timely interventions. Built for educational institutions to enhance student success rates through data-driven insights.
 
@@ -9,28 +9,28 @@
 
 ---
 
-## 🚀 Features
+## Features
 
-### 📊 Core Functionality
+### Core Functionality
 - **Real-Time Risk Monitoring** - Track student performance metrics (GPA, attendance, deadlines)
 - **AI-Powered Predictions** - Random Forest ML model predicts student failure risk with 90%+ accuracy
 - **Dynamic Dashboards** - Role-based interfaces for Admins, Supervisors, and Students
 - **Communication Hub** - Direct messaging between supervisors and students
 - **Intervention Tracking** - Log and monitor support actions for at-risk students
 
-### 🤖 AI/ML Capabilities
+### AI/ML Capabilities
 - **Training on Real Data** - Model learns from actual student records in your database
 - **Adaptive Learning** - Retrain model via API as new data accumulates
 - **Risk Scoring** - 0-100% probability output with Low/Medium/High categorization
 - **Hybrid Intelligence** - Combines ML predictions with rule-based logic for edge cases
 
-### 👥 User Roles
+### User Roles
 - **Superadmin** - System-wide control, user management, broadcast notifications
 - **Admin** - Student oversight, risk rule configuration, school settings
 - **Supervisor** - Monitor assigned students, send interventions
 - **Student** - Self-view dashboard with performance trends
 
-### ⚙️ Additional Features
+### Additional Features
 - **School Branding** - Customize school name, logo, and contact details
 - **Notification System** - Real-time alerts and system-wide broadcasts
 - **Export Reports** - Generate performance summaries (PDF support planned)
@@ -38,7 +38,7 @@
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Backend
 - **Framework:** Flask 3.x (Python)
@@ -56,20 +56,20 @@
 
 ---
 
-## 📦 Installation
+## Installation
 
 ### Prerequisites
 - Python 3.13+
 - Node.js 18+
 - PostgreSQL 12+
 
-### 1️⃣ Clone Repository
+### 1. Clone Repository
 ```bash
-git clone https://github.com/yourusername/SPMIS.git
-cd SPMIS
+git clone https://github.com/AlvinMutie/Edvantage.git
+cd Edvantage
 ```
 
-### 2️⃣ Backend Setup
+### 2. Backend Setup
 ```bash
 cd backend
 
@@ -92,7 +92,7 @@ python seed.py
 python seed_superadmin.py
 ```
 
-### 3️⃣ Frontend Setup
+### 3. Frontend Setup
 ```bash
 cd ../frontend
 
@@ -103,7 +103,7 @@ npm install
 npm run dev
 ```
 
-### 4️⃣ Launch Application
+### 4. Launch Application
 ```bash
 # Terminal 1: Backend
 cd backend
@@ -118,7 +118,7 @@ npm run dev
 
 ---
 
-## 🔑 Default Credentials
+## Default Credentials
 
 | Role | Username | Password |
 |------|----------|----------|
@@ -129,7 +129,7 @@ npm run dev
 
 ---
 
-## 📚 API Endpoints
+## API Endpoints
 
 ### Authentication
 ```http
@@ -178,9 +178,9 @@ PUT /api/settings/    # Update (logo, name, address)
 
 ---
 
-## 🤖 AI Model Details
+## AI Model Details
 
-### Algorithm: **Random Forest Classifier**
+### Algorithm: Random Forest Classifier
 - **Training Data:** Real student records from database
 - **Features:** GPA (0-4.0), Attendance % (0-100), Missed Deadlines
 - **Output:** Risk probability (0-100%)
@@ -189,7 +189,7 @@ PUT /api/settings/    # Update (logo, name, address)
 
 ### How Risk Detection Works
 
-#### 1️⃣ **Data Collection & Labeling**
+#### 1. Data Collection & Labeling
 The system automatically labels students during training:
 
 ```python
@@ -207,12 +207,12 @@ else:
 **Example Training Data:**
 | GPA | Attendance | Missed Deadlines | Label |
 |-----|------------|------------------|-------|
-| 3.8 | 98% | 0 | ✅ Safe (0) |
-| 1.8 | 60% | 5 | ❌ At Risk (1) |
-| 2.2 | 75% | 3 | ❌ At Risk (1) |
-| 3.0 | 85% | 1 | ✅ Safe (0) |
+| 3.8 | 98% | 0 | Safe (0) |
+| 1.8 | 60% | 5 | At Risk (1) |
+| 2.2 | 75% | 3 | At Risk (1) |
+| 3.0 | 85% | 1 | Safe (0) |
 
-#### 2️⃣ **Random Forest Decision Process**
+#### 2. Random Forest Decision Process
 The Random Forest creates 100 different decision trees. Each tree asks questions like:
 
 **Example Decision Tree:**
@@ -232,7 +232,7 @@ Each of the 100 trees makes its own prediction, then they **vote**:
 - 73 trees say "At Risk" → 73% risk probability
 - 27 trees say "Safe" → 27% safe probability
 
-#### 3️⃣ **Risk Score Calculation**
+#### 3. Risk Score Calculation
 ```python
 # Prediction Flow
 features = [student_gpa, student_attendance, missed_deadlines]
@@ -249,7 +249,7 @@ if student_gpa < 1.0:
     risk_score = max(risk_score, 95)  # Force high risk
 ```
 
-#### 4️⃣ **Feature Importance (What Matters Most?)**
+#### 4. Feature Importance (What Matters Most?)
 The model learns which features are most predictive:
 
 1. **GPA** - 55% importance (Most critical)
@@ -258,7 +258,7 @@ The model learns which features are most predictive:
 
 **Why?** Students with low GPAs are statistically more likely to fail, regardless of attendance. However, combining low GPA with poor attendance dramatically increases risk.
 
-#### 5️⃣ **Real-World Example**
+#### 5. Real-World Example
 
 **Student A:**
 - GPA: 1.9
@@ -267,15 +267,15 @@ The model learns which features are most predictive:
 
 **Processing:**
 ```
-Tree 1: GPA < 2.0? YES → Attendance < 70%? YES → Vote: At Risk ❌
-Tree 2: Attendance < 75%? YES → GPA < 2.5? YES → Vote: At Risk ❌
-Tree 3: GPA < 3.0? YES → Missed > 2? YES → Vote: At Risk ❌
+Tree 1: GPA < 2.0? YES → Attendance < 70%? YES → Vote: At Risk
+Tree 2: Attendance < 75%? YES → GPA < 2.5? YES → Vote: At Risk
+Tree 3: GPA < 3.0? YES → Missed > 2? YES → Vote: At Risk
 ...
-Tree 100: GPA < 2.5? YES → Vote: At Risk ❌
+Tree 100: GPA < 2.5? YES → Vote: At Risk
 
 Final Vote: 87 trees say "At Risk"
 Risk Score: 87%
-Risk Level: 🔴 HIGH
+Risk Level: HIGH
 ```
 
 **Student B:**
@@ -285,18 +285,18 @@ Risk Level: 🔴 HIGH
 
 **Processing:**
 ```
-Tree 1: GPA < 2.0? NO → Attendance < 85%? NO → Vote: Safe ✅
-Tree 2: Attendance < 75%? NO → Vote: Safe ✅
-Tree 3: GPA < 3.0? NO → Vote: Safe ✅
+Tree 1: GPA < 2.0? NO → Attendance < 85%? NO → Vote: Safe
+Tree 2: Attendance < 75%? NO → Vote: Safe
+Tree 3: GPA < 3.0? NO → Vote: Safe
 ...
-Tree 100: GPA < 2.5? NO → Vote: Safe ✅
+Tree 100: GPA < 2.5? NO → Vote: Safe
 
 Final Vote: 95 trees say "Safe"
 Risk Score: 5%
-Risk Level: 🟢 LOW
+Risk Level: LOW
 ```
 
-#### 6️⃣ **Continuous Improvement**
+#### 6. Continuous Improvement
 The model improves over time:
 - **Training:** Uses all historical student records
 - **Validation:** Compares predictions to actual outcomes
@@ -306,9 +306,9 @@ The model improves over time:
 ### Risk Categorization
 | Score | Level | Icon | Action |
 |-------|-------|------|--------|
-| 0-40% | 🟢 Low | ✅ | Monitor regularly |
-| 40-75% | 🟡 Medium | ⚠️ | Early intervention recommended |
-| 75-100% | 🔴 High | 🚨 | Urgent support required |
+| 0-40% | Low | [Safe] | Monitor regularly |
+| 40-75% | Medium | [Warning] | Early intervention recommended |
+| 75-100% | High | [Danger] | Urgent support required |
 
 ### Retraining the Model
 ```bash
@@ -324,7 +324,7 @@ curl -X POST http://127.0.0.1:5000/api/ai/retrain \
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 ```
 SPMIS/
 ├── backend/
@@ -351,7 +351,7 @@ SPMIS/
 
 ---
 
-## 💡 Key Technical Highlights
+## Key Technical Highlights
 
 ### Machine Learning Implementation
 - **Custom ML Pipeline**: Built a complete training-to-prediction pipeline from scratch
@@ -374,14 +374,14 @@ SPMIS/
 
 ---
 
-## 🧪 Testing & Validation
+## Testing & Validation
 
 ### Model Validation
 ```bash
 # Current model performance on real student data
-✅ Accuracy: 91.7% (trained on 57 students)
-✅ Precision: 89.2%
-✅ Recall: 94.1%
+Accuracy: 91.7% (trained on 57 students)
+Precision: 89.2%
+Recall: 94.1%
 ```
 
 ### API Testing
@@ -392,7 +392,7 @@ All endpoints tested using:
 
 ---
 
-## 🚀 Deployment Ready
+## Deployment Ready
 
 ### Production Considerations
 - **Scalability**: Stateless API design allows horizontal scaling
@@ -414,7 +414,7 @@ docker-compose up --build
 
 ---
 
-## 📈 Future Enhancements
+## Future Enhancements
 
 - [ ] **Enhanced ML Features**: Add assignment scores, login frequency, course difficulty
 - [ ] **Advanced Analytics**: Predictive trends, cohort analysis, success rate forecasting
@@ -426,7 +426,7 @@ docker-compose up --build
 
 ---
 
-## 🛠️ Development Workflow
+## Development Workflow
 
 ### Quick Start
 ```bash
@@ -453,7 +453,7 @@ npm install && npm run dev
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please follow these steps:
 
@@ -470,10 +470,10 @@ Contributions are welcome! Please follow these steps:
 
 ---
 
-## 📝 License
+## License
 
 This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-**Built with ❤️ for Educational Excellence**
+**Built with pride for Educational Excellence**
