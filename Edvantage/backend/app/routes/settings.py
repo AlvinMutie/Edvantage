@@ -5,6 +5,7 @@ from app import db
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.models.user import User
 from werkzeug.utils import secure_filename
+from app.services.audit_service import log_audit
 
 settings_bp = Blueprint('settings', __name__)
 
@@ -55,6 +56,7 @@ def update_settings():
             settings.logo_url = f"/static/uploads/{filename}"
 
     db.session.commit()
+    log_audit("Update School Settings", user_id=user.id, target_type="Settings", details=f"User {user.username} updated school settings.")
     return jsonify(settings.to_dict()), 200
 
 # Explicitly serve static files if needed (though standard Flask static folder usually handles this)

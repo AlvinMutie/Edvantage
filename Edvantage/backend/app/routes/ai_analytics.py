@@ -17,17 +17,28 @@ def predict_student_risk():
         return jsonify({"msg": "GPA and Attendance are required fields"}), 400
 
     risk_score = ai_service.predict_risk(float(gpa), float(attendance), int(missed_deadlines))
-    
     risk_level = "Low"
+    suggestion = "Continue monitoring student progress regularly."
+
     if risk_score > 75:
         risk_level = "High"
+        if float(attendance) < 70:
+            suggestion = "Urgent: Immediate intervention required due to critical attendance levels. Schedule a mandatory meeting."
+        elif float(gpa) < 2.0:
+            suggestion = "Urgent: Academic support required. Enroll in mandatory tutoring and study groups."
+        else:
+            suggestion = "High Alert: Schedule a comprehensive assessment meeting to identify underlying issues."
     elif risk_score > 40:
         risk_level = "Medium"
+        suggestion = "Proactive measure: Supervisor check-in recommended to discuss academic goals and barriers."
 
     return jsonify({
         "risk_score": risk_score,
         "risk_level": risk_level,
+        "suggestion": suggestion,
         "factors": {
+    ...
+
             "gpa": gpa,
             "attendance": attendance,
             "missed_deadlines": missed_deadlines

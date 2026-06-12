@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import NotificationCenter from './NotificationCenter';
+import logo from '../assets/logo.png';
 import {
     LayoutDashboard,
     Users,
@@ -46,7 +47,7 @@ const Navbar = ({ schoolSettings, toggleSidebar }) => {
                     {schoolSettings?.logo ? (
                         <img src={schoolSettings.logo} alt="Logo" className="w-8 h-8 object-contain" />
                     ) : (
-                        <ShieldAlert className="text-primary-500 h-6 w-6" />
+                        <img src={logo} alt="EdVantage Logo" className="w-8 h-8 object-contain" />
                     )}
                     <span className="font-bold text-xl tracking-tight text-white">{schoolSettings?.name || 'EdVantage'}</span>
                 </div>
@@ -135,9 +136,7 @@ const DashboardLayout = ({ children }) => {
                         {schoolSettings.logo ? (
                             <img src={schoolSettings.logo} alt="Logo" className="w-8 h-8 object-contain" />
                         ) : (
-                            <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center shrink-0">
-                                <span className="text-white font-bold">E</span>
-                            </div>
+                            <img src={logo} alt="EdVantage Logo" className="w-8 h-8 object-contain" />
                         )}
                         <span className="font-bold text-white truncate text-lg">{schoolSettings.name}</span>
                     </div>

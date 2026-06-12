@@ -9,7 +9,7 @@ class RiskPredictionService:
     def __init__(self):
         self.model = None
         self.model_path = 'student_risk_model.pkl'
-        self._initialize_model()
+        # Do not initialize model here to avoid DB access on import
 
     def _initialize_model(self):
         """

@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, send_file
 from app.models.student import Student
 from app.models.assignment import Assignment
+from app.models.audit_log import AuditLog
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from reportlab.lib.pagesizes import letter, A4
 from reportlab.lib import colors
@@ -143,6 +144,71 @@ def generate_student_report(student_id):
         as_attachment=True,
         download_name=f'student_report_{student.student_id}_{datetime.now().strftime("%Y%m%d")}.pdf'
     )
+
+@reports_bp.route('/comprehensive/<int:student_id>', methods=['GET'])
+@jwt_required()
+def generate_comprehensive_report(student_id):
+    """Generate a comprehensive PDF report including audit logs and performance trends"""
+    student = Student.query.get_or_404(student_id)
+    
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter)
+    elements = []
+    styles = getSampleStyleSheet()
+    
+    # Title
+    title_style = ParagraphStyle('Title', parent=styles['Heading1'], fontSize=22, textColor=colors.HexColor('#4338CA'), spaceAfter=20)
+    elements.append(Paragraph(f"Comprehensive Performance Audit: {student.full_name}", title_style))
+    
+    # 1. Basic Info
+    info_data = [
+        ['ID', student.student_id],
+        ['Dept', student.department],
+        ['GPA', f"{student.gpa:.2f}"],
+        ['Attendance', f"{student.attendance:.1f}%"],
+        ['Risk Status', student.risk_status]
+    ]
+    t = Table(info_data, colWidths=[1.5*inch, 4.5*inch])
+    t.setStyle(TableStyle([('GRID', (0,0), (-1,-1), 0.5, colors.grey), ('BACKGROUND', (0,0), (0,-1), colors.whitesmoke)]))
+    elements.append(t)
+    elements.append(Spacer(1, 0.2*inch))
+    
+    # 2. Performance Trends
+    elements.append(Paragraph("Performance Summary", styles['Heading2']))
+    trends_desc = f"Current GPA is {student.gpa}. Risk level is currently {student.risk_status}."
+    elements.append(Paragraph(trends_desc, styles['Normal']))
+    elements.append(Spacer(1, 0.2*inch))
+    
+    # 3. System Audit Logs
+    elements.append(Paragraph("System Activity Logs", styles['Heading2']))
+    logs = AuditLog.query.filter_by(target_type='Student', target_id=student.id).order_by(AuditLog.timestamp.desc()).limit(20).all()
+    
+    if logs:
+        log_data = [['Timestamp', 'Action', 'User', 'Details']]
+        for log in logs:
+            log_data.append([
+                log.timestamp.strftime('%Y-%m-%d %H:%M'),
+                log.action,
+                log.user.username if log.user else 'System',
+                (log.details[:40] + '...') if log.details and len(log.details) > 40 else (log.details or '')
+            ])
+        log_table = Table(log_data, colWidths=[1.2*inch, 1.5*inch, 1*inch, 2.8*inch])
+        log_table.setStyle(TableStyle([
+            ('BACKGROUND', (0,0), (-1,0), colors.HexColor('#F3F4F6')),
+            ('GRID', (0,0), (-1,-1), 0.5, colors.silver),
+            ('FONTSIZE', (0,0), (-1,-1), 8)
+        ]))
+        elements.append(log_table)
+    else:
+        elements.append(Paragraph("No recent audit activity found for this student.", styles['Italic']))
+
+    # Footer
+    elements.append(Spacer(1, 0.5*inch))
+    elements.append(Paragraph(f"Report ID: COMP-{student.id}-{int(datetime.now().timestamp())}", styles['Normal']))
+    
+    doc.build(elements)
+    buffer.seek(0)
+    return send_file(buffer, mimetype='application/pdf', as_attachment=True, download_name=f'comprehensive_{student.student_id}.pdf')
 
 def get_status(value, metric_type):
     """Helper to get status label based on value"""

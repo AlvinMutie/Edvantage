@@ -4,6 +4,7 @@ from app.models.student import Student
 from app.schemas import UserSchema
 from app import db, jwt
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
+from app.services.audit_service import log_audit
 
 auth_bp = Blueprint('auth', __name__)
 user_schema = UserSchema()
@@ -47,6 +48,7 @@ def register():
         db.session.add(student_profile)
     
     db.session.commit()
+    log_audit("User Registration", user_id=user.id, target_type="User", target_id=user.id, details=f"User {user.username} registered.")
     
     return jsonify({"msg": "User created successfully"}), 201
 
@@ -57,8 +59,10 @@ def login():
     
     if user and user.check_password(data.get('password')):
         access_token = create_access_token(identity=str(user.id))
+        log_audit("User Login", user_id=user.id, details=f"User {user.username} logged in.")
         return jsonify(access_token=access_token, role=user.role), 200
     
+    log_audit("Failed Login Attempt", details=f"Failed login attempt for username: {data.get('username')}")
     return jsonify({"msg": "Bad username or password"}), 401
 
 @auth_bp.route('/me', methods=['GET'])

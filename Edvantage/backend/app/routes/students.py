@@ -4,6 +4,8 @@ from app.models.performance import PerformanceRecord
 from app.schemas import StudentSchema, PerformanceRecordSchema
 from app import db
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from app.services.audit_service import log_audit
+from app.services.resource_service import get_recommendations
 
 students_bp = Blueprint('students', __name__)
 student_schema = StudentSchema()
@@ -48,6 +50,16 @@ def add_performance(id):
     )
     db.session.add(record)
     db.session.commit()
+    
+    current_user_id = get_jwt_identity()
+    log_audit(
+        action="Add Performance Record",
+        user_id=int(current_user_id),
+        target_type="Student",
+        target_id=id,
+        details=f"Added {data['record_type']} record with value {data['value']}"
+    )
+    
     return jsonify(performance_schema.dump(record)), 201
 
 @students_bp.route('/<int:id>/assign-supervisor', methods=['PUT'])
@@ -65,10 +77,27 @@ def assign_supervisor(id):
     if not supervisor or supervisor.role != 'supervisor':
          return jsonify({"msg": "Invalid supervisor ID"}), 400
          
+    old_supervisor_id = student.supervisor_id
     student.supervisor_id = supervisor_id
     db.session.commit()
+    
+    current_user_id = get_jwt_identity()
+    log_audit(
+        action="Assign Supervisor",
+        user_id=int(current_user_id),
+        target_type="Student",
+        target_id=id,
+        details=f"Assigned supervisor {supervisor_id} (previous: {old_supervisor_id})"
+    )
     
     return jsonify({
         "msg": "Supervisor assigned successfully",
         "student": student.to_dict()
     }), 200
+
+@students_bp.route('/<int:id>/recommendations', methods=['GET'])
+@jwt_required()
+def student_recommendations(id):
+    """Get personalized educational resources based on performance"""
+    recommendations = get_recommendations(id)
+    return jsonify(recommendations), 200

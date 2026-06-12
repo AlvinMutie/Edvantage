@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import logo from '../assets/logo.png';
 import {
     ShieldCheck,
     TrendingUp,
@@ -67,9 +68,7 @@ const LandingPage = () => {
             <nav className="fixed top-0 w-full z-50 bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/50">
                 <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 bg-gradient-to-tr from-primary-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/20">
-                            <ShieldCheck className="text-white" size={24} />
-                        </div>
+                        <img src={logo} alt="EdVantage Logo" className="h-10 w-10 object-contain" />
                         <span className="font-bold text-2xl tracking-tighter text-white">EdVantage</span>
                     </div>
                     <div className="flex items-center gap-6">
@@ -80,6 +79,7 @@ const LandingPage = () => {
                     </div>
                 </div>
             </nav>
+
 
             {/* Hero Section */}
             <div className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 px-6">

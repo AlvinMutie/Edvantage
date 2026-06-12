@@ -3,11 +3,13 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 from flask_migrate import Migrate
+from flask_socketio import SocketIO
 from config import Config
 
 db = SQLAlchemy()
 jwt = JWTManager()
 migrate = Migrate()
+socketio = SocketIO(cors_allowed_origins="*")
 
 def create_app(config_class=Config):
     app = Flask(__name__)
@@ -16,6 +18,7 @@ def create_app(config_class=Config):
     db.init_app(app)
     jwt.init_app(app)
     migrate.init_app(app)
+    socketio.init_app(app)
 
     CORS(app, resources={r"/api/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
 
@@ -63,5 +66,14 @@ def create_app(config_class=Config):
 
     from app.routes.messages import messages_bp
     app.register_blueprint(messages_bp, url_prefix='/api/messages')
+
+    from app.routes.parents import parents_bp
+    app.register_blueprint(parents_bp, url_prefix='/api/parents')
+
+    from app.routes.gamification import gamification_bp
+    app.register_blueprint(gamification_bp, url_prefix='/api/gamification')
+
+    # Import socket events to register them
+    from app.services import socket_service
 
     return app

@@ -4,6 +4,7 @@ from app.models.student import Student
 from app import db
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from datetime import datetime
+from app.services.audit_service import log_audit
 
 assignments_bp = Blueprint('assignments', __name__)
 
@@ -47,6 +48,7 @@ def update_assignment(id):
     assignment = Assignment.query.get_or_404(id)
     data = request.get_json()
     
+    old_score = assignment.score
     if 'score' in data:
         assignment.score = data['score']
         assignment.status = 'graded'
@@ -57,6 +59,16 @@ def update_assignment(id):
         assignment.status = data['status']
     
     db.session.commit()
+    
+    current_user_id = get_jwt_identity()
+    log_audit(
+        action="Update Assignment",
+        user_id=int(current_user_id),
+        target_type="Assignment",
+        target_id=id,
+        details=f"Updated assignment {id}. Score: {old_score} -> {assignment.score}, Status: {assignment.status}"
+    )
+    
     return jsonify(assignment.to_dict()), 200
 
 @assignments_bp.route('/<int:id>', methods=['DELETE'])
