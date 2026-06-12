@@ -75,11 +75,6 @@ const LandingPage = () => {
             <section className="relative pt-40 pb-20 lg:pt-56 lg:pb-32 px-6">
                 <div className="max-w-7xl mx-auto">
                     <div className="text-center space-y-10 max-w-4xl mx-auto">
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900/50 border border-slate-800 text-primary-400 text-xs font-bold tracking-widest uppercase animate-in fade-in zoom-in-95 duration-700">
-                            <Sparkles size={14} className="animate-pulse" />
-                            Next-Gen Student Analytics
-                        </div>
-
                         <h1 className="text-6xl lg:text-[100px] font-black tracking-tight leading-[0.9] text-white animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100">
                             Empower Success <br /> 
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 via-indigo-400 to-purple-400">Through Data Intelligence</span>
