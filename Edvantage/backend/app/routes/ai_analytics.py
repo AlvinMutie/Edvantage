@@ -37,8 +37,6 @@ def predict_student_risk():
         "risk_level": risk_level,
         "suggestion": suggestion,
         "factors": {
-    ...
-
             "gpa": gpa,
             "attendance": attendance,
             "missed_deadlines": missed_deadlines
