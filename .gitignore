@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+backend/venv/
+
+# IDEs
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+backend/.env
+
+# Build outputs
+frontend/dist/
+backend/dist/
+backend/build/
+
+# Python cache
+__pycache__/
+backend/__pycache__/
+backend/app/__pycache__/
+backend/app/models/__pycache__/
+backend/app/routes/__pycache__/
+backend/app/services/__pycache__/
+
+# Database
+backend/instance/spmis.db
