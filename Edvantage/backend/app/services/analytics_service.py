@@ -89,9 +89,18 @@ class InterventionAnalyticsService:
     def _update_effectiveness_stats(self, intervention_type, score):
         stats = InterventionEffectiveness.query.filter_by(intervention_type=intervention_type).first()
         if not stats:
-            stats = InterventionEffectiveness(intervention_type=intervention_type)
+            stats = InterventionEffectiveness(
+                intervention_type=intervention_type,
+                total_count=0,
+                success_count=0,
+                avg_effectiveness_score=0.0
+            )
             db.session.add(stats)
         
+        if stats.total_count is None: stats.total_count = 0
+        if stats.success_count is None: stats.success_count = 0
+        if stats.avg_effectiveness_score is None: stats.avg_effectiveness_score = 0.0
+
         stats.total_count += 1
         if score > 0.6:
             stats.success_count += 1

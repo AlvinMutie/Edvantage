@@ -18,8 +18,8 @@ class ModelRetrainingService:
         # 1. Build Dataset
         X, y = feature_dataset_builder.build_training_dataset()
         
-        if X is None or len(X) < 10:
-            print("Insufficient data for retraining. N < 10.")
+        if X is None or len(X) < 5:
+            print("Insufficient data for retraining. N < 5.")
             return False
 
         # 2. Train Model (RandomForest)

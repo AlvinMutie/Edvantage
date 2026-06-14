@@ -153,12 +153,8 @@ class RiskPredictionService:
 
     def predict_student_risk(self, student_id):
         from app.models.student import Student
-        from app.models.performance import Grade, Attendance
-        from app.models.assignment import Submission
-        from app.models.behavior import BehavioralIncident
-        from app.models.finance import StudentFinance
-        from app.models.engagement import StudentEngagement
-        from app.models.risk import Referral, RiskPrediction, ModelVersion
+        from app.models.risk import RiskPrediction, ModelVersion
+        from app.services.temporal_feature_service import temporal_feature_service
         from app import db
         
         if not self.model and not self._load_model():
@@ -168,39 +164,27 @@ class RiskPredictionService:
         if not student:
             return None
             
-        # Feature extraction
-        gpa = student.gpa or 0.0
-        attendance = student.attendance or 0.0
-        late_subs = Submission.query.filter_by(student_id=student.id, status='late').count()
-        missing_subs = Submission.query.filter_by(student_id=student.id, status='missing').count()
+        # 1. Get Temporal Features (Parity with training)
+        features_dict = temporal_feature_service.get_student_features(student_id)
         
-        incidents = BehavioralIncident.query.filter_by(student_id=student.id).all()
-        incident_count = len(incidents)
-        avg_severity = np.mean([i.severity for i in incidents]) if incidents else 0.0
+        # 2. Add categorical dummy support (though prediction usually lacks the categorical part initially)
+        # We need to ensure the columns match the model's expected input
+        X_pred = pd.DataFrame([features_dict])
         
-        engagement = StudentEngagement.query.filter_by(student_id=student.id).first()
-        login_count = engagement.login_count if engagement else 0
-        resource_usage = engagement.resource_access_count if engagement else 0
-        participation = engagement.participation_score if engagement else 0.0
+        # Handle dummy columns if model was trained with them (intervention_type)
+        # If model expects intervention_type columns, we add them as 0 for prediction context
+        expected_cols = self.model.feature_names_in_ if hasattr(self.model, 'feature_names_in_') else []
+        for col in expected_cols:
+            if col not in X_pred.columns:
+                X_pred[col] = 0
         
-        finance = StudentFinance.query.filter_by(student_id=student.id).first()
-        fee_balance = finance.balance if finance else 0.0
-        referral_count = Referral.query.filter_by(student_id=student.id).count()
+        # Ensure order matches training
+        if len(expected_cols) > 0:
+            X_pred = X_pred[expected_cols]
         
-        feature_row = [
-            gpa, attendance, late_subs, missing_subs, 
-            incident_count, avg_severity, 
-            login_count, resource_usage, participation,
-            fee_balance, referral_count
-        ]
+        # Fill NAs
+        X_pred = X_pred.fillna(0)
         
-        feature_names = [
-            'gpa', 'attendance', 'late_submissions', 'missing_submissions',
-            'incident_count', 'avg_severity',
-            'login_count', 'resource_usage', 'participation_score',
-            'fee_balance', 'referral_count'
-        ]
-        X_pred = pd.DataFrame([feature_row], columns=feature_names)
         risk_level_idx = self.model.predict(X_pred)[0]
         probabilities = self.model.predict_proba(X_pred)[0]
         
@@ -212,14 +196,16 @@ class RiskPredictionService:
         levels = ['Low', 'Medium', 'High', 'Critical']
         risk_level = levels[risk_level_idx]
         
-        # Explainability
+        # Explainability (Basic heuristics for now)
         reasons = []
-        if gpa < 2.0: reasons.append("Low GPA detected")
-        if attendance < 75: reasons.append("Low attendance detected")
-        if missing_subs > 2: reasons.append("Multiple missing assignments")
-        if incident_count > 2: reasons.append("High number of behavioral incidents")
-        if fee_balance > 3000: reasons.append("Significant outstanding fee balance")
-        if resource_usage < 10: reasons.append("Low LMS resource engagement")
+        gpa_30d = features_dict.get('gpa_avg_30d')
+        if gpa_30d is not None and gpa_30d < 2.0: reasons.append("Low GPA trend detected")
+        
+        att_30d = features_dict.get('att_rate_30d')
+        if att_30d is not None and att_30d < 75: reasons.append("Low attendance trend detected")
+        
+        inc_30d = features_dict.get('incidents_30d')
+        if inc_30d is not None and inc_30d > 1: reasons.append("Recent behavioral incidents")
         
         # Get active model version
         active_version = ModelVersion.query.filter_by(is_active=True).order_by(ModelVersion.created_at.desc()).first()
@@ -237,7 +223,7 @@ class RiskPredictionService:
             trace_id=trace_id
         )
         db.session.add(prediction)
-        db.session.flush() # Ensure prediction has an ID
+        db.session.flush()
 
         # Emit Event
         from app.services.event_bus import event_bus
@@ -245,33 +231,23 @@ class RiskPredictionService:
             'student_id': student.id,
             'risk_level': risk_level,
             'probability': probability,
-            'factors': {
-                'gpa': gpa,
-                'attendance': attendance,
-                'fee_balance': fee_balance,
-                'incident_count': incident_count
-            }
+            'features': features_dict
         }, trace_id=trace_id)
 
-        # Trigger Recommendations (Automated Workflow)
+        # Trigger Recommendations
         from app.services.intervention_service import intervention_service
-        context_data = {
-            'gpa': gpa,
-            'attendance': attendance,
-            'late_submissions': late_subs,
-            'missing_submissions': missing_subs,
-            'incident_count': incident_count,
-            'avg_severity': avg_severity,
-            'login_count': login_count,
-            'resource_usage': resource_usage,
-            'participation_score': participation,
-            'fee_balance': fee_balance,
-            'referral_count': referral_count,
-            'trace_id': trace_id
-        }
+        # Context data needs to be consistent with what engines expect
+        context_data = features_dict.copy()
+        context_data['trace_id'] = trace_id
+        
+        # Map temporal names back to what RuleEngine expects if necessary, 
+        # or update RuleEngine. Let's keep RuleEngine using its expected names.
+        context_data['gpa'] = features_dict.get('gpa_avg_30d') or student.gpa
+        context_data['attendance'] = features_dict.get('att_rate_30d') or student.attendance
+        context_data['incident_count'] = features_dict.get('incidents_30d') or 0
+        
         intervention_service.generate_recommendations(student, prediction, context_data)
         
-        # Update student status
         student.risk_status = risk_level
         db.session.commit()
         
@@ -279,12 +255,7 @@ class RiskPredictionService:
             'risk_level': risk_level,
             'probability': probability,
             'reasons': reasons,
-            'factors': {
-                'gpa': gpa,
-                'attendance': attendance,
-                'fee_balance': fee_balance,
-                'incident_count': incident_count
-            }
+            'factors': features_dict
         }
 
 ai_service = RiskPredictionService()

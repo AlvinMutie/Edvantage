@@ -39,9 +39,15 @@ class FeatureDatasetBuilder:
             
             # 2. Get Y (Outcome Score)
             # Use the effectiveness_score calculated during outcome recording
-            label = outcome.effectiveness_score or 0.0
+            score = outcome.effectiveness_score or 0.0
             
-            # Metadata
+            # Convert continuous score to discrete risk labels for the classifier
+            # High effectiveness (close to 1.0) means student is now LOW risk (0)
+            if score > 0.8: label = 0 # Low
+            elif score > 0.5: label = 1 # Medium
+            elif score > 0.2: label = 2 # High
+            else: label = 3 # Critical
+            
             features['label'] = label
             features['trace_id'] = outcome.trace_id
             

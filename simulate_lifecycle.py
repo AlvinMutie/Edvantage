@@ -63,6 +63,7 @@ def simulate_lifecycle():
         # 4. RECORD OUTCOMES
         print("\nStep 4: Recording Outcomes (Triggering Loop)...")
         # We need 5 outcomes to trigger retraining based on retraining_service.py logic
+        import random 
         outcome_count = 0
         for i, intervention in enumerate(interventions):
             print(f"Recording outcome for intervention {intervention.id}...")
@@ -70,7 +71,6 @@ def simulate_lifecycle():
                 'notes': f"Completed intervention {i+1}",
                 'success_rating': random.randint(3, 5)
             }
-            import random # local import just in case
             outcome = analytics_service.record_outcome(intervention.id, outcome_data, supervisor.id)
             if outcome:
                 outcome_count += 1

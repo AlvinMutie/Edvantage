@@ -59,6 +59,7 @@ class Intervention(db.Model):
     status = db.Column(db.String(20), default='open') # open, closed
     notes = db.Column(db.Text)
     due_date = db.Column(db.DateTime, nullable=True)
+    trace_id = db.Column(db.String(36), nullable=True, index=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     student = db.relationship('Student', backref=db.backref('interventions', lazy=True))
@@ -87,6 +88,7 @@ class InterventionOutcome(db.Model):
     completed_by_id = db.Column(db.String(36), db.ForeignKey('users.id'))
     follow_up_date = db.Column(db.DateTime)
     completion_date = db.Column(db.DateTime)
+    trace_id = db.Column(db.String(36), nullable=True, index=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     intervention = db.relationship('Intervention', backref=db.backref('outcome', uselist=False))
@@ -117,6 +119,7 @@ class InterventionRecommendation(db.Model):
     confidence_score = db.Column(db.Float)
     urgency_score = db.Column(db.Float)
     predicted_effectiveness = db.Column(db.Float)
+    trace_id = db.Column(db.String(36), nullable=True, index=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     student = db.relationship('Student', backref=db.backref('recommendations', lazy=True))
