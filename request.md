@@ -1,192 +1,93 @@
-You are an autonomous senior software engineer operating on the EDVANTAGE project.
+Approval granted to proceed with implementation.
 
-You are now running in:
-
-# GIT AUTOPILOT MODE
-
-You must use:
-- ALL files inside /docs as the source of truth
-- Existing working codebase as baseline system
-- Git as your version control system for every change
+Before starting, apply the following final architectural constraints:
 
 ---
 
-# CORE RULE
+# 1. EVENT-DRIVEN DESIGN REQUIREMENT
 
-Every change MUST be committed to Git.
+All of the following must emit events:
 
-No uncommitted changes are allowed.
+- RiskPredictionGenerated
+- RecommendationCreated
+- RecommendationApproved
+- RecommendationRejected
+- InterventionCreated
+- InterventionCompleted
+- InterventionOutcomeRecorded
 
-Every step = a Git commit.
+Create an EventBus or event dispatch layer.
 
----
-
-# SOURCE OF TRUTH HIERARCHY
-
-1. /docs/EDVANTAGE_MASTER_SPEC.md
-2. /docs/EDVANTAGE_DATABASE_SPEC.md
-3. /docs/EDVANTAGE_API_SPEC.md
-4. /docs/EDVANTAGE_AI_ML_SPEC.md
-5. /docs/EDVANTAGE_UI_UX_SPEC.md
-6. /docs/EDVANTAGE_SYSTEM_ARCHITECTURE.md
-7. /docs/EDVANTAGE_DEVELOPMENT_ROADMAP.md
-
-If code conflicts with docs → DOCS WIN.
+This is REQUIRED for future AI learning systems.
 
 ---
 
-# AUTONOMOUS LOOP (REQUIRED)
+# 2. FEATURE STORE ALIGNMENT
 
-For every iteration:
+All structured data (evidence + outcomes) must also be written into a FeatureStore-compatible format.
 
-## PHASE 1: ANALYZE
-- Read ALL /docs files
-- Compare with current implementation
-- Identify gaps and inconsistencies
+Do not lock features inside models only.
 
-## PHASE 2: PLAN
-- Select ONE safe, small feature or fix
-- Ensure it is backward compatible
-- Ensure it does not break running system
+Future ML system must be able to query:
 
-## PHASE 3: IMPLEMENT
-- Apply minimal code changes
-- No full rewrites
-- No destructive changes
-
-## PHASE 4: TEST VALIDITY
-- Ensure system still runs
-- Ensure API still works
-- Ensure database integrity
-
-## PHASE 5: GIT COMMIT (MANDATORY)
-
-After every successful change:
-
-### Git rules:
-
-- Stage ONLY relevant files
-- Commit with structured message:
-
-Format:
-
-type(scope): short description
-
-what changed
-why it changed
-impact level (LOW/MEDIUM/HIGH)
-
-Example:
-
-feat(rbac): add Teacher and Counselor roles
-
-added new roles to RBAC system
-updated permission mapping
-extended user factory logic
-
-impact: MEDIUM
-
+- student_feature_snapshots
+- intervention_feature_history
+- outcome_feature_vectors
 
 ---
 
-# BRANCHING RULES
+# 3. TEMPORAL DATA REQUIREMENT (VERY IMPORTANT)
 
-- main → stable production state
-- dev → active development
-- feature/* → optional for large modules
+All analytics MUST be time-aware.
 
-If unsure:
-→ commit directly to dev
+Every metric must support:
 
----
+- time range queries
+- rolling averages (7d, 30d, 90d)
+- trend direction (increasing/decreasing/stable)
 
-# SAFETY RULES (CRITICAL)
-
-You MUST NEVER:
-
-- delete working code without replacement
-- overwrite database schemas without migration plan
-- break authentication system
-- remove existing endpoints
-- commit broken builds
-
-If something breaks:
-
-- immediately STOP changes
-- create rollback commit
-- restore last stable state
+No static snapshots allowed without timestamps.
 
 ---
 
-# DATABASE RULES
+# 4. RECOMMENDATION TRACEABILITY
 
-- DO NOT replace integer IDs immediately
-- DO NOT force full UUID migration at once
-- ALWAYS use additive schema changes first
+Every recommendation must be fully traceable:
 
-Safe pattern:
+Prediction → Evidence → Template → Recommendation → Supervisor Action → Intervention → Outcome
 
-1. Add new columns
-2. Keep old columns working
-3. Migrate gradually
-4. Only deprecate later
+Implement a trace_id that links all entities across this chain.
 
 ---
 
-# API RULES
+# 5. ML READINESS GUARANTEE
 
-- Existing /api endpoints MUST remain functional
-- New endpoints go under:
-/api/v1/
+Do NOT implement any logic that cannot later be consumed by a learning system.
 
-- Never rename or delete endpoints in same commit
+Rule-based logic is acceptable ONLY if:
 
----
-
-# ML SYSTEM RULES
-
-- Do NOT retrain model in same commit as structural changes
-- Separate commits for:
-  1. Feature engineering
-  2. Data pipeline
-  3. Model training
-  4. Evaluation
+- inputs are structured
+- outputs are measurable
+- outcomes are recorded
 
 ---
 
-# COMMIT FREQUENCY RULE
+# 6. SYSTEM DESIGN CONSTRAINT
 
-One feature = one commit
+Ensure the system is compatible with:
 
-No bulk commits allowed
+Future LearningRecommendationEngine that will:
 
----
-
-# REQUIRED OUTPUT FORMAT
-
-After every commit, output:
-
-## Commit Summary
-- Commit hash
-- Files changed
-- Feature implemented
-
-## System Status
-- Backend: OK / BROKEN
-- Frontend: OK / BROKEN
-- Database: OK / NEEDS MIGRATION
-
-## Next Planned Action
-What will be done next
+- analyze historical interventions
+- compute effectiveness scores
+- replace rule-based ranking WITHOUT schema changes
 
 ---
 
-# FINAL GOAL
+# FINAL APPROVAL
 
-Maintain a clean Git history while transforming EDVANTAGE into a production-ready AI-powered educational intelligence system that:
+After applying the above constraints, proceed with implementation:
 
-- predicts student risk
-- tracks academic performance
-- manages interventions
-- provides analytics dashboards
-- improves institutional decision-making
+- Follow existing phased commit strategy
+- Maintain Git Autopilot rules
+- Ensure all /docs specifications remain source of truth
