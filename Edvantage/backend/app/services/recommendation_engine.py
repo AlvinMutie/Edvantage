@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from app.models.risk import InterventionTemplate, InterventionRecommendation, RecommendationEvidence
+from app.models.risk import InterventionTemplate, InterventionRecommendation, RecommendationEvidence, InterventionEffectiveness
 from app import db
 from datetime import datetime
 
@@ -112,3 +112,61 @@ class RuleBasedRecommendationEngine(RecommendationEngine):
                 base_urgency = max(base_urgency, 0.9)
                 
         return min(base_urgency, 1.0)
+
+class LearningRecommendationEngine(RecommendationEngine):
+    def get_recommendations(self, student, risk_prediction, context_data):
+        templates = InterventionTemplate.query.filter_by(is_active=True).all()
+        effectiveness_stats = {e.intervention_type: e for e in InterventionEffectiveness.query.all()}
+        
+        recommendations = []
+        
+        # 1. First, identify applicable categories based on risk context
+        categories = []
+        if context_data.get('gpa', 4.0) < 2.5: categories.append('tutoring')
+        if context_data.get('attendance', 100) < 85: categories.append('counseling')
+        if context_data.get('incident_count', 0) > 0: categories.append('counseling')
+        if context_data.get('fee_balance', 0) > 1000: categories.append('financial')
+        
+        applicable_templates = []
+        for template in templates:
+            if any(cat in template.intervention_type.lower() or cat in template.name.lower() for cat in categories):
+                applicable_templates.append(template)
+
+        # 2. Score and Rank based on Historical Effectiveness
+        scored_templates = []
+        for template in applicable_templates:
+            stats = effectiveness_stats.get(template.intervention_type)
+            
+            # Predictive Score = (Historical Effectiveness * 0.7) + (Priority Weight * 0.3)
+            hist_eff = stats.avg_effectiveness_score if stats else 0.5
+            priority_map = {'Critical': 1.0, 'High': 0.8, 'Medium': 0.5, 'Low': 0.3}
+            prio_weight = priority_map.get(template.priority, 0.5)
+            
+            score = (hist_eff * 0.7) + (prio_weight * 0.3)
+            scored_templates.append((template, score, hist_eff))
+
+        # Rank by score descending
+        scored_templates.sort(key=lambda x: x[1], reverse=True)
+
+        for template, score, hist_eff in scored_templates:
+            rec = InterventionRecommendation(
+                student_id=student.id,
+                risk_prediction_id=risk_prediction.id,
+                template_id=template.id,
+                status='pending',
+                confidence_score=0.9 if stats else 0.5,
+                urgency_score=score,
+                predicted_effectiveness=hist_eff,
+                trace_id=context_data.get('trace_id')
+            )
+            
+            evidence = RecommendationEvidence(
+                metric_name='learning_score',
+                current_value=score,
+                threshold_value=0.5,
+                trend='stable'
+            )
+            rec.evidence.append(evidence)
+            recommendations.append(rec)
+            
+        return recommendations

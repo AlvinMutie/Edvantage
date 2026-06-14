@@ -162,3 +162,13 @@ class RiskRule(db.Model):
     threshold = db.Column(db.Float, nullable=False)
     risk_level = db.Column(db.String(20), nullable=False) # Low, Medium, High
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class InterventionEffectiveness(db.Model):
+    __tablename__ = 'intervention_effectiveness'
+    id = db.Column(db.String(36), primary_key=True, default=generate_uuid)
+    intervention_type = db.Column(db.String(50), nullable=False, unique=True)
+    avg_effectiveness_score = db.Column(db.Float, default=0.0)
+    success_count = db.Column(db.Integer, default=0)
+    total_count = db.Column(db.Integer, default=0)
+    risk_reduction_avg = db.Column(db.Float, default=0.0)
+    last_updated = db.Column(db.DateTime, default=datetime.utcnow)
