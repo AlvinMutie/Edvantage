@@ -1,91 +1,101 @@
-ENTER SYSTEM STABILIZATION MODE.
+ENTER AI INTELLIGENCE VALIDATION LAYER IMPLEMENTATION.
 
-Do NOT add new features, ML improvements, or architecture enhancements.
+Do NOT modify core ML logic or pipelines.
 
-Only fix runtime-breaking issues preventing end-to-end execution.
-
----
-
-# 1. CRITICAL SCHEMA FIX (BLOCKING ISSUE)
-
-## Problem:
-InterventionRecommendation model is missing trace_id.
-
-## Required Fix:
-- Add trace_id field (UUID, indexed)
-- Ensure trace_id is propagated from:
-  RiskPrediction → Recommendation → Intervention → Outcome
-
-## RULE:
-trace_id MUST exist in ALL lifecycle tables.
+Only add validation, monitoring, and proof-of-learning systems.
 
 ---
 
-# 2. FEATURE PARITY FIX (CRITICAL ML BUG)
+# 1. LEARNING PROOF SYSTEM (CRITICAL)
 
-## Problem:
-Training uses 16+ temporal features, inference uses 11 snapshot features.
+Implement:
 
-## Required Fix:
-- Create UnifiedFeatureService (single source of truth)
-- BOTH training and inference MUST use identical feature set
-- Remove all duplicate feature extractors
+LearningEvaluationService
 
-## RULE:
-Feature vector MUST be identical in:
-- FeatureDatasetBuilder
-- ai_service.predict_student_risk
+Must track over time:
 
----
+- Model accuracy before vs after retraining
+- Precision/recall trends per model version
+- Intervention success rate improvement over time
 
-# 3. FLOW RECOVERY REQUIREMENT
-
-Fix system so that:
-
-Prediction → Recommendation → Intervention → Outcome
-
-executes WITHOUT runtime crash.
-
-No step may block the pipeline.
+Output:
+- learning_gain_score per model version
 
 ---
 
-# 4. RETRAINING PIPELINE VERIFICATION
+# 2. DRIFT DETECTION SYSTEM
 
-Ensure ModelRetrainingService is:
+Implement:
 
-- reachable in production flow
-- triggered after outcome recording
-- NOT blocked by earlier failures
+DriftDetectionService
+
+Must detect:
+
+- data drift (feature distribution changes)
+- concept drift (label relationship changes)
+- prediction drift (output instability)
+
+Trigger alerts when drift exceeds threshold.
 
 ---
 
-# 5. NO NEW FEATURES RULE
+# 3. MODEL VERSION GOVERNANCE
 
-Strictly forbidden:
+Create:
+
+ModelRegistryService
+
+Must support:
+
+- version history
+- performance comparison
+- rollback capability
+- A/B testing (shadow vs active model)
+
+No model should go live without evaluation metrics.
+
+---
+
+# 4. INTELLIGENCE DASHBOARD METRICS
+
+Add system-wide metrics:
+
+- Learning Improvement Curve
+- Intervention Effectiveness Over Time
+- Model Stability Index
+- Drift Severity Index
+
+---
+
+# 5. CLOSED-LOOP VERIFICATION CRITERIA
+
+System is ONLY considered a "Validated Learning System" if:
+
+- Each retraining improves at least one metric over time
+- No degradation in prediction stability
+- Drift is detected and logged
+- Model versions are comparable historically
+
+---
+
+# 6. NO NEW FEATURES RULE
+
+Do NOT add:
+
 - new ML models
-- new dashboards
-- new analytics
-- new engines
+- new recommendation logic
+- new UI features
 
-ONLY fix broken execution flow.
-
----
-
-# 6. SUCCESS CRITERION
-
-System is ONLY considered fixed when:
-
-A full student lifecycle can execute end-to-end WITHOUT errors:
-
-Prediction → Recommendation → Intervention → Outcome → Retraining
+ONLY add validation and observability.
 
 ---
 
 # FINAL GOAL
 
-Restore system from:
-"crashing pipeline system"
+Transform system from:
 
-to:
-"fully executable closed-loop system"
+"Closed-loop system (unvalidated)"
+
+TO:
+
+"Validated adaptive learning system"
