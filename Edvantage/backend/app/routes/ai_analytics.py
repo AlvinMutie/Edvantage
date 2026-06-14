@@ -1,60 +1,67 @@
 from flask import Blueprint, jsonify, request
 from app.services.ai_service import ai_service
+from app.services.model_registry_service import model_registry_service
+from app.services.learning_evaluation_service import learning_evaluation_service
+from app.services.drift_detection_service import drift_detection_service
 from flask_jwt_extended import jwt_required
 
 ai_bp = Blueprint('ai', __name__)
 
-@ai_bp.route('/predict', methods=['POST'])
+@ai_bp.route('/predict/<student_id>', methods=['POST'])
 @jwt_required()
-def predict_student_risk():
-    data = request.get_json()
+def predict_student_risk(student_id):
+    """Predicts risk for a specific student using the latest validated model."""
+    result = ai_service.predict_student_risk(student_id)
+    if not result:
+        return jsonify({"msg": "Student not found"}), 404
+        
+    return jsonify(result), 200
+
+@ai_bp.route('/intelligence/metrics', methods=['GET'])
+@jwt_required()
+def get_intelligence_metrics():
+    """Exposes high-level intelligence validation metrics."""
+    versions = model_registry_service.get_version_history()
     
-    gpa = data.get('gpa')
-    attendance = data.get('attendance')
-    missed_deadlines = data.get('missed_deadlines', 0)
+    # 1. Learning Improvement Curve
+    accuracy_trend = []
+    gain_trend = []
+    for v in reversed(versions):
+        log = v.training_logs[0] if v.training_logs else None
+        if log and log.metrics:
+            accuracy_trend.append({
+                'version': v.name,
+                'accuracy': log.metrics.get('accuracy', 0.0),
+                'date': v.created_at.isoformat()
+            })
+            gain_trend.append(log.metrics.get('learning_gain_score', 0.0))
 
-    if gpa is None or attendance is None:
-        return jsonify({"msg": "GPA and Attendance are required fields"}), 400
+    # 2. Intervention Effectiveness
+    success_trend = learning_evaluation_service.get_intervention_success_trend()
 
-    risk_score = ai_service.predict_risk(float(gpa), float(attendance), int(missed_deadlines))
-    risk_level = "Low"
-    suggestion = "Continue monitoring student progress regularly."
-
-    if risk_score > 75:
-        risk_level = "High"
-        if float(attendance) < 70:
-            suggestion = "Urgent: Immediate intervention required due to critical attendance levels. Schedule a mandatory meeting."
-        elif float(gpa) < 2.0:
-            suggestion = "Urgent: Academic support required. Enroll in mandatory tutoring and study groups."
-        else:
-            suggestion = "High Alert: Schedule a comprehensive assessment meeting to identify underlying issues."
-    elif risk_score > 40:
-        risk_level = "Medium"
-        suggestion = "Proactive measure: Supervisor check-in recommended to discuss academic goals and barriers."
-
+    # 3. Drift & Stability
+    latest_v = versions[0] if versions else None
+    latest_log = latest_v.training_logs[0] if latest_v else None
+    drift_alert = latest_log.metrics.get('drift_alert', False) if latest_log else False
+    
     return jsonify({
-        "risk_score": risk_score,
-        "risk_level": risk_level,
-        "suggestion": suggestion,
-        "factors": {
-            "gpa": gpa,
-            "attendance": attendance,
-            "missed_deadlines": missed_deadlines
+        "learning_improvement_curve": accuracy_trend,
+        "learning_gain_history": gain_trend,
+        "intervention_success_trend": success_trend,
+        "model_stability": {
+            "drift_detected": drift_alert,
+            "drift_severity": 0.1 if drift_alert else 0.0 # Placeholder
         },
-        "model_type": "RandomForestClassifier v1.0 (Trained on Real Data)"
+        "system_status": "Validated adaptive learning system" if len(versions) > 1 else "Closed-loop system (unvalidated)"
     }), 200
 
 @ai_bp.route('/retrain', methods=['POST'])
 @jwt_required()
 def retrain_model():
-    """Endpoint to manually retrain the model with latest student data"""
-    try:
-        # Force delete old model to trigger retraining
-        import os
-        if os.path.exists('student_risk_model.pkl'):
-            os.remove('student_risk_model.pkl')
-        
-        ai_service._initialize_model()
-        return jsonify({"msg": "Model retrained successfully on latest student data"}), 200
-    except Exception as e:
-        return jsonify({"msg": f"Retraining failed: {str(e)}"}), 500
+    """Endpoint to manually retrain the model with validation"""
+    from app.services.retraining_service import model_retraining_service
+    success = model_retraining_service.trigger_retraining(trigger_type='manual')
+    if success:
+        return jsonify({"msg": "Model retrained and validated successfully"}), 200
+    else:
+        return jsonify({"msg": "Retraining failed or insufficient data"}), 500

@@ -86,11 +86,23 @@ def simulate_lifecycle():
         if latest_log:
             print(f"Retraining DETECTED at {latest_log.trained_at}")
             print(f"Retraining Info: {latest_log.dataset_info}")
+            print(f"Validation Metrics: {latest_log.metrics}")
         else:
             print("NO RETRAINING DETECTED.")
 
-        # 6. VERIFY PRODUCTION CONTINUITY
-        print("\nStep 6: Verifying Production Continuity (Next Prediction)...")
+        # 6. CHECK INTELLIGENCE DASHBOARD
+        print("\nStep 6: Checking Intelligence Dashboard Metrics...")
+        from app.services.model_registry_service import model_registry_service
+        from app.services.learning_evaluation_service import learning_evaluation_service
+        
+        versions = model_registry_service.get_version_history()
+        print(f"Total Model Versions: {len(versions)}")
+        
+        success_trend = learning_evaluation_service.get_intervention_success_trend()
+        print(f"Intervention Success Trend (Moving Avg): {success_trend}")
+
+        # 7. VERIFY PRODUCTION CONTINUITY
+        print("\nStep 7: Verifying Production Continuity (Next Prediction)...")
         try:
             student = Student.query.first()
             print(f"Attempting prediction for {student.full_name} using the new model...")
