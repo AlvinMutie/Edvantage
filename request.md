@@ -1,93 +1,91 @@
-Approval granted to proceed with implementation.
+ENTER SYSTEM STABILIZATION MODE.
 
-Before starting, apply the following final architectural constraints:
+Do NOT add new features, ML improvements, or architecture enhancements.
 
----
-
-# 1. EVENT-DRIVEN DESIGN REQUIREMENT
-
-All of the following must emit events:
-
-- RiskPredictionGenerated
-- RecommendationCreated
-- RecommendationApproved
-- RecommendationRejected
-- InterventionCreated
-- InterventionCompleted
-- InterventionOutcomeRecorded
-
-Create an EventBus or event dispatch layer.
-
-This is REQUIRED for future AI learning systems.
+Only fix runtime-breaking issues preventing end-to-end execution.
 
 ---
 
-# 2. FEATURE STORE ALIGNMENT
+# 1. CRITICAL SCHEMA FIX (BLOCKING ISSUE)
 
-All structured data (evidence + outcomes) must also be written into a FeatureStore-compatible format.
+## Problem:
+InterventionRecommendation model is missing trace_id.
 
-Do not lock features inside models only.
+## Required Fix:
+- Add trace_id field (UUID, indexed)
+- Ensure trace_id is propagated from:
+  RiskPrediction → Recommendation → Intervention → Outcome
 
-Future ML system must be able to query:
-
-- student_feature_snapshots
-- intervention_feature_history
-- outcome_feature_vectors
-
----
-
-# 3. TEMPORAL DATA REQUIREMENT (VERY IMPORTANT)
-
-All analytics MUST be time-aware.
-
-Every metric must support:
-
-- time range queries
-- rolling averages (7d, 30d, 90d)
-- trend direction (increasing/decreasing/stable)
-
-No static snapshots allowed without timestamps.
+## RULE:
+trace_id MUST exist in ALL lifecycle tables.
 
 ---
 
-# 4. RECOMMENDATION TRACEABILITY
+# 2. FEATURE PARITY FIX (CRITICAL ML BUG)
 
-Every recommendation must be fully traceable:
+## Problem:
+Training uses 16+ temporal features, inference uses 11 snapshot features.
 
-Prediction → Evidence → Template → Recommendation → Supervisor Action → Intervention → Outcome
+## Required Fix:
+- Create UnifiedFeatureService (single source of truth)
+- BOTH training and inference MUST use identical feature set
+- Remove all duplicate feature extractors
 
-Implement a trace_id that links all entities across this chain.
-
----
-
-# 5. ML READINESS GUARANTEE
-
-Do NOT implement any logic that cannot later be consumed by a learning system.
-
-Rule-based logic is acceptable ONLY if:
-
-- inputs are structured
-- outputs are measurable
-- outcomes are recorded
+## RULE:
+Feature vector MUST be identical in:
+- FeatureDatasetBuilder
+- ai_service.predict_student_risk
 
 ---
 
-# 6. SYSTEM DESIGN CONSTRAINT
+# 3. FLOW RECOVERY REQUIREMENT
 
-Ensure the system is compatible with:
+Fix system so that:
 
-Future LearningRecommendationEngine that will:
+Prediction → Recommendation → Intervention → Outcome
 
-- analyze historical interventions
-- compute effectiveness scores
-- replace rule-based ranking WITHOUT schema changes
+executes WITHOUT runtime crash.
+
+No step may block the pipeline.
 
 ---
 
-# FINAL APPROVAL
+# 4. RETRAINING PIPELINE VERIFICATION
 
-After applying the above constraints, proceed with implementation:
+Ensure ModelRetrainingService is:
 
-- Follow existing phased commit strategy
-- Maintain Git Autopilot rules
-- Ensure all /docs specifications remain source of truth
+- reachable in production flow
+- triggered after outcome recording
+- NOT blocked by earlier failures
+
+---
+
+# 5. NO NEW FEATURES RULE
+
+Strictly forbidden:
+- new ML models
+- new dashboards
+- new analytics
+- new engines
+
+ONLY fix broken execution flow.
+
+---
+
+# 6. SUCCESS CRITERION
+
+System is ONLY considered fixed when:
+
+A full student lifecycle can execute end-to-end WITHOUT errors:
+
+Prediction → Recommendation → Intervention → Outcome → Retraining
+
+---
+
+# FINAL GOAL
+
+Restore system from:
+"crashing pipeline system"
+
+to:
+"fully executable closed-loop system"
