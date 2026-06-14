@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api/axios';
-import { Users, AlertTriangle, CheckCircle2, MessageSquare } from 'lucide-react';
+import { Users, TriangleAlert, CircleCheckBig, MessageSquare } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import RecommendationQueue from '../components/RecommendationQueue';
 
 const SupervisorDashboard = () => {
     const [students, setStudents] = useState([]);
@@ -96,9 +97,9 @@ const SupervisorDashboard = () => {
                                         <td className="px-6 py-4">
                                             <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${student.risk_status === 'At Risk'
                                                     ? 'bg-red-500/10 text-red-500 border border-red-500/20'
-                                                    : 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'
+                                                    : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
                                                 }`}>
-                                                {student.risk_status === 'At Risk' ? <AlertTriangle size={12} /> : <CheckCircle2 size={12} />}
+                                                {student.risk_status === 'At Risk' ? <TriangleAlert size={12} /> : <CircleCheckBig size={12} />}
                                                 {student.risk_status}
                                             </span>
                                         </td>

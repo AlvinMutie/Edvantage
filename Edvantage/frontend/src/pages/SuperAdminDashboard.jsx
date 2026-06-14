@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api/axios';
-import { Users, Shield, UserCheck, GraduationCap, ArrowRight } from 'lucide-react';
+import { Users, Shield, UserCheck, GraduationCap, ArrowRight, TriangleAlert } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import BroadcastCenter from '../components/BroadcastCenter';
 
@@ -19,24 +19,25 @@ const StatCard = ({ icon: Icon, label, value, color, bg }) => (
 );
 
 const SuperAdminDashboard = () => {
-    const [stats, setStats] = useState({ total: 0, admin: 0, supervisor: 0, student: 0 });
+    const [stats, setStats] = useState({ total: 0, admin: 0, supervisor: 0, student: 0, superadmin: 0 });
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         const fetchUsers = async () => {
             try {
                 const res = await api.get('/users/');
-                const users = res.data;
-                const newStats = {
+                const users = Array.isArray(res.data) ? res.data : [];
+                setStats({
                     total: users.length,
                     admin: users.filter(u => u.role === 'admin').length,
                     supervisor: users.filter(u => u.role === 'supervisor').length,
                     student: users.filter(u => u.role === 'student').length,
                     superadmin: users.filter(u => u.role === 'superadmin').length
-                };
-                setStats(newStats);
+                });
             } catch (err) {
                 console.error("Failed to fetch user stats", err);
+                setError("Could not load system statistics.");
             } finally {
                 setLoading(false);
             }
@@ -44,7 +45,11 @@ const SuperAdminDashboard = () => {
         fetchUsers();
     }, []);
 
-    if (loading) return <div className="text-white">Loading system stats...</div>;
+    if (loading) return (
+        <div className="flex items-center justify-center h-64">
+            <div className="text-slate-400 animate-pulse">Loading system statistics...</div>
+        </div>
+    );
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
@@ -52,6 +57,13 @@ const SuperAdminDashboard = () => {
                 <h1 className="text-3xl font-bold text-white">System Administration</h1>
                 <p className="text-slate-400 mt-2">Manage user accounts and system access.</p>
             </div>
+
+            {error && (
+                <div className="bg-amber-500/10 border border-amber-500/20 text-amber-400 p-4 rounded-xl text-sm flex items-center gap-3">
+                    <TriangleAlert size={20} />
+                    {error}
+                </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <StatCard icon={Users} label="Total Accounts" value={stats.total} color="text-blue-400" bg="bg-blue-500/10" />

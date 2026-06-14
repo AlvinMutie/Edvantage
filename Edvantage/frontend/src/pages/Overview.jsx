@@ -11,7 +11,7 @@ import {
     Pie,
     Cell
 } from 'recharts';
-import { Users, GraduationCap, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { Users, GraduationCap, TriangleAlert, CircleCheckBig } from 'lucide-react';
 
 const StatsCard = ({ icon: Icon, label, value, color, delay }) => (
     <div className={`p-6 bg-slate-900 border border-slate-800 rounded-2xl shadow-xl transition-all hover:border-slate-700 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both`}>
@@ -73,8 +73,8 @@ const Overview = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <StatsCard icon={Users} label="Total Students" value="57" color="bg-blue-600" />
-                <StatsCard icon={AlertTriangle} label="At Risk" value="17" color="bg-amber-500" />
-                <StatsCard icon={CheckCircle2} label="Interventions" value="12" color="bg-emerald-500" />
+                <StatsCard icon={TriangleAlert} label="At Risk" value="17" color="bg-amber-500" />
+                <StatsCard icon={CircleCheckBig} label="Interventions" value="12" color="bg-emerald-500" />
                 <StatsCard icon={GraduationCap} label="Graduation Progress" value="84%" color="bg-indigo-600" />
             </div>
 

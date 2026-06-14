@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api/axios';
-import { Lightbulb, Check, X, AlertCircle, TrendingDown, Info, ChevronRight, BarChart2 } from 'lucide-react';
+import { Lightbulb, Check, X, CircleAlert, TrendingDown, Info, ChevronRight, BarChart2 } from 'lucide-react';
 
 const RecommendationQueue = () => {
     const [recommendations, setRecommendations] = useState([]);
@@ -77,7 +77,7 @@ const RecommendationQueue = () => {
                             <div className="p-4 border-b border-slate-800 bg-slate-950/50 flex justify-between items-center">
                                 <div className="flex items-center gap-3">
                                     <div className={`p-1.5 rounded-lg ${rec.urgency_score > 0.8 ? 'bg-red-500/10' : 'bg-blue-500/10'}`}>
-                                        <AlertCircle className={rec.urgency_score > 0.8 ? 'text-red-500' : 'text-blue-500'} size={18} />
+                                        <CircleAlert className={rec.urgency_score > 0.8 ? 'text-red-500' : 'text-blue-500'} size={18} />
                                     </div>
                                     <div>
                                         <h4 className="text-sm font-bold text-white group-hover:text-blue-400 transition-colors">{rec.template_name}</h4>

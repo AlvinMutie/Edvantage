@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import api from '../api/axios';
-import { Brain, TrendingUp, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Brain, TrendingUp, CircleAlert, CircleCheckBig } from 'lucide-react';
 
 const AIPredictionDemo = () => {
     const [formData, setFormData] = useState({
@@ -39,9 +39,9 @@ const AIPredictionDemo = () => {
 
     const getRiskIcon = (level) => {
         switch (level) {
-            case 'High': return <AlertCircle className="text-red-400" size={32} />;
+            case 'High': return <CircleAlert className="text-red-400" size={32} />;
             case 'Medium': return <TrendingUp className="text-amber-400" size={32} />;
-            case 'Low': return <CheckCircle2 className="text-emerald-400" size={32} />;
+            case 'Low': return <CircleCheckBig className="text-emerald-400" size={32} />;
             default: return <Brain className="text-slate-400" size={32} />;
         }
     };

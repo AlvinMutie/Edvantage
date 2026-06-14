@@ -30,7 +30,7 @@ class ModelRetrainingService:
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
         # 3. Train Model
-        model = RandomForestClassifier(n_estimators=100, random_state=42)
+        model = RandomForestClassifier(n_estimators=100, max_depth=5, random_state=42)
         model.fit(X_train, y_train)
 
         # 4. Evaluation Metrics
@@ -95,7 +95,7 @@ class ModelRetrainingService:
         
         new_outcomes = InterventionOutcome.query.filter(InterventionOutcome.completion_date > last_trained_at).count()
         
-        if new_outcomes >= 5: # Retrain every 5 new outcomes (low for demo, high for prod)
+        if new_outcomes >= 20: # Retrain every 20 new outcomes (increased from 5 for stability)
             return self.trigger_retraining(trigger_type='event_driven')
         
         return False

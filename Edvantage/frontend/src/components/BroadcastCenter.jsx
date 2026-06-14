@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import api from '../api/axios';
-import { Megaphone, Send, Info, AlertTriangle, CheckCircle2, XCircle } from 'lucide-react';
+import { Megaphone, Send, Info, TriangleAlert, CircleCheckBig, CircleX } from 'lucide-react';
 
 const BroadcastCenter = () => {
     const [title, setTitle] = useState('');
@@ -80,9 +80,9 @@ const BroadcastCenter = () => {
                                     }`}
                             >
                                 {t === 'info' && <Info size={16} />}
-                                {t === 'warning' && <AlertTriangle size={16} />}
-                                {t === 'success' && <CheckCircle2 size={16} />}
-                                {t === 'error' && <XCircle size={16} />}
+                                {t === 'warning' && <TriangleAlert size={16} />}
+                                {t === 'success' && <CircleCheckBig size={16} />}
+                                {t === 'error' && <CircleX size={16} />}
                                 <span className="text-sm">{t}</span>
                             </button>
                         ))}
@@ -91,7 +91,7 @@ const BroadcastCenter = () => {
 
                 {status && (
                     <div className={`p-4 rounded-xl flex items-center gap-3 ${status.type === 'success' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}`}>
-                        {status.type === 'success' ? <CheckCircle2 size={20} /> : <AlertTriangle size={20} />}
+                        {status.type === 'success' ? <CircleCheckBig size={20} /> : <TriangleAlert size={20} />}
                         <span className="text-sm font-medium">{status.text}</span>
                     </div>
                 )}

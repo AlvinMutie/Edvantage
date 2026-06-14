@@ -92,6 +92,17 @@ python seed.py
 python seed_superadmin.py
 ```
 
+### 🔐 Default Login Credentials
+
+For development and testing purposes, use the following accounts:
+
+| Role | Username | Password |
+| :--- | :--- | :--- |
+| **Superadmin** | `superadmin` | `superadmin123` |
+| **Admin** | `admin` | `admin123` |
+| **Supervisor** | `supervisor` | `password123` |
+| **Student** | `student` | `password123` |
+
 ### 3. Frontend Setup
 ```bash
 cd ../frontend

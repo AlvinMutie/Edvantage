@@ -4,8 +4,8 @@ import {
     TrendingUp,
     Calendar,
     BookOpen,
-    AlertTriangle,
-    CheckCircle2,
+    TriangleAlert,
+    CircleCheckBig,
     Target,
     Award,
     Clock
@@ -15,9 +15,7 @@ const StudentDashboard = () => {
     const [overview, setOverview] = useState(null);
     const [riskData, setRiskData] = useState(null);
     const [suggestions, setSuggestions] = useState([]);
-    const [loading, setLoading
-
-    ] = useState(true);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         fetchDashboardData();
@@ -171,7 +169,7 @@ const StudentDashboard = () => {
             {suggestions.length > 0 && (
                 <div className="bg-slate-900 rounded-2xl border border-slate-800 p-6">
                     <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                        <AlertTriangle size={24} className="text-amber-400" />
+                        <TriangleAlert size={24} className="text-amber-400" />
                         Personalized Suggestions
                     </h3>
                     <div className="space-y-3">
@@ -195,7 +193,7 @@ const StudentDashboard = () => {
                                         </div>
                                         <p className="text-sm mb-2">{suggestion.message}</p>
                                         <button className="text-xs font-bold opacity-70 hover:opacity-100 transition-opacity flex items-center gap-1">
-                                            <CheckCircle2 size={14} />
+                                            <CircleCheckBig size={14} />
                                             {suggestion.action}
                                         </button>
                                     </div>

@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import api from '../api/axios';
 import {
     Bell,
-    AlertTriangle,
+    TriangleAlert,
     MessageSquare,
-    CheckCircle2,
+    CircleCheckBig,
     Clock,
     X,
     Info,
@@ -36,9 +36,9 @@ const NotificationCenter = ({ isOpen, onClose }) => {
 
     const getIcon = (type) => {
         switch (type) {
-            case 'warning': return AlertTriangle;
-            case 'success': return CheckCircle2;
-            case 'error': return AlertTriangle;
+            case 'warning': return TriangleAlert;
+            case 'success': return CircleCheckBig;
+            case 'error': return TriangleAlert;
             default: return Info; // or Megaphone for general
         }
     }

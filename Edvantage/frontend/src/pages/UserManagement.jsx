@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api/axios';
-import { Trash2, Search, Edit2, Key, X, Check, Eye, EyeOff } from 'lucide-react';
+import { Trash2, Search, Pencil, Key, X, Check, Eye, EyeOff, TriangleAlert } from 'lucide-react';
 
 const UserManagement = () => {
     const [users, setUsers] = useState([]);
@@ -137,7 +137,7 @@ const UserManagement = () => {
                                             className="p-2 text-slate-400 hover:text-blue-400 transition-colors"
                                             title="Edit User"
                                         >
-                                            <Edit2 size={18} />
+                                            <Pencil size={18} />
                                         </button>
                                         <button
                                             onClick={() => setResettingUser(user)}

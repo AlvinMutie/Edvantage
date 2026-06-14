@@ -4,8 +4,8 @@ import {
     Search,
     Filter,
     Clock,
-    CheckCircle2,
-    AlertCircle,
+    CircleCheckBig,
+    TriangleAlert,
     MoreVertical,
     ExternalLink
 } from 'lucide-react';
@@ -24,9 +24,9 @@ const StatusBadge = ({ status }) => {
     };
 
     const icons = {
-        Completed: <CheckCircle2 size={14} />,
+        Completed: <CircleCheckBig size={14} />,
         'In Progress': <Clock size={14} />,
-        Pending: <AlertCircle size={14} />,
+        Pending: <TriangleAlert size={14} />,
     };
 
     return (
