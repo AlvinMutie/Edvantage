@@ -32,9 +32,9 @@ def seed_ml_data():
         # 2. Create Staff Users
         staff_data = [
             ('Admin User', 'admin', 'admin@edvantage.com', 'admin'),
-            ('Teacher Smith', 'tsmith', 'teacher@edvantage.com', 'teacher'),
-            ('Supervisor Jones', 'sjones', 'supervisor@edvantage.com', 'supervisor'),
-            ('Counselor Brown', 'cbrown', 'counselor@edvantage.com', 'counselor')
+            ('Teacher User', 'teacher', 'teacher@edvantage.com', 'teacher'),
+            ('Supervisor User', 'supervisor', 'supervisor@edvantage.com', 'supervisor'),
+            ('Counselor User', 'counselor', 'counselor@edvantage.com', 'counselor')
         ]
         user_map = {}
         for name, uname, email, rname in staff_data:

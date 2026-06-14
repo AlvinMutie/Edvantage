@@ -19,12 +19,12 @@ def seed_data():
 
         # Create Admin
         admin = User(username='admin', email='admin@spmis.com', role='admin')
-        admin.set_password('admin123')
+        admin.set_password('password123')
         db.session.add(admin)
 
         # Create Superadmin
         superadmin = User(username='superadmin', email='superadmin@spmis.com', role='superadmin')
-        superadmin.set_password('superadmin123')
+        superadmin.set_password('password123')
         db.session.add(superadmin)
 
         # Create Supervisor
