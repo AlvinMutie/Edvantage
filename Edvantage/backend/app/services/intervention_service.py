@@ -1,16 +1,24 @@
-from app.models.risk import InterventionRecommendation, Intervention, InterventionOutcome, InterventionTemplate
-from app.services.recommendation_engine import RuleBasedRecommendationEngine
+from app.models.risk import InterventionRecommendation, Intervention, InterventionOutcome, InterventionTemplate, InterventionEffectiveness
+from app.services.recommendation_engine import RuleBasedRecommendationEngine, LearningRecommendationEngine
 from app import db
 from datetime import datetime, timedelta
 
 class InterventionRecommendationService:
     def __init__(self, engine=None):
-        self.engine = engine or RuleBasedRecommendationEngine()
+        self.engine = engine # Will decide dynamically if None
+
+    def _get_engine(self):
+        if self.engine: return self.engine
+        # Check if we have enough effectiveness data to use learning engine
+        if InterventionEffectiveness.query.count() >= 3:
+            return LearningRecommendationEngine()
+        return RuleBasedRecommendationEngine()
 
     def generate_recommendations(self, student, risk_prediction, context_data):
         """
         Orchestrates the generation and storage of recommendations.
         """
+        engine = self._get_engine()
         # Remove any existing pending recommendations for this student and prediction to avoid duplicates
         InterventionRecommendation.query.filter_by(
             student_id=student.id, 
@@ -19,7 +27,7 @@ class InterventionRecommendationService:
         ).delete()
         
         from app.services.event_bus import event_bus
-        recommendations = self.engine.get_recommendations(student, risk_prediction, context_data)
+        recommendations = engine.get_recommendations(student, risk_prediction, context_data)
         for rec in recommendations:
             db.session.add(rec)
             # Emit event for each recommendation
@@ -27,7 +35,8 @@ class InterventionRecommendationService:
                 'student_id': student.id,
                 'recommendation_id': rec.id,
                 'template_name': rec.template.name if rec.template else 'Custom',
-                'urgency': rec.urgency_score
+                'urgency': rec.urgency_score,
+                'engine_type': engine.__class__.__name__
             }, trace_id=rec.trace_id)
             
         db.session.commit()
@@ -77,7 +86,6 @@ class InterventionRecommendationService:
         db.session.add(intervention)
         
         # Emit events
-        from app.services.event_bus import event_bus
         event_bus.emit('RecommendationApproved', {
             'recommendation_id': rec.id,
             'intervention_id': intervention.id,
