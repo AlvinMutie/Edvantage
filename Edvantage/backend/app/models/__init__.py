@@ -1,5 +1,5 @@
 from app.models.user import User, Role, Permission
-from app.models.student import Student, Department, Course, Subject, Semester
+from app.models.student import Student, Department, Course, Subject, Semester, AcademicYear
 from app.models.performance import Enrollment, Grade, Attendance, Teacher, Supervisor, Counselor
 from app.models.risk import RiskPrediction, Intervention, InterventionOutcome, Referral, CounselingSession, ModelVersion, ModelTrainingLog, FeatureImportance
 from app.models.assignment import Assignment, Submission

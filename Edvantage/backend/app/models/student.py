@@ -26,12 +26,21 @@ class Subject(db.Model):
     credit_units = db.Column(db.Integer, default=3)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+class AcademicYear(db.Model):
+    __tablename__ = 'academic_years'
+    id = db.Column(db.String(36), primary_key=True, default=generate_uuid)
+    year_label = db.Column(db.String(50), nullable=False) # e.g., '2024/2025'
+    is_current = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
 class Semester(db.Model):
     __tablename__ = 'semesters'
     id = db.Column(db.String(36), primary_key=True, default=generate_uuid)
-    name = db.Column(db.String(50), nullable=False) # e.g., 'Semester 1 2024'
-    academic_year = db.Column(db.String(20), nullable=False)
+    name = db.Column(db.String(50), nullable=False) # e.g., 'Semester 1'
+    academic_year_id = db.Column(db.String(36), db.ForeignKey('academic_years.id'), nullable=False)
     is_active = db.Column(db.Boolean, default=False)
+    
+    academic_year = db.relationship('AcademicYear', backref=db.backref('semesters', lazy=True))
 
 class Student(db.Model):
     __tablename__ = 'students'
