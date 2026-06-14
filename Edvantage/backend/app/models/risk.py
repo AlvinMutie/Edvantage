@@ -52,13 +52,18 @@ class Intervention(db.Model):
     id = db.Column(db.String(36), primary_key=True, default=generate_uuid)
     student_id = db.Column(db.String(36), db.ForeignKey('students.id'), nullable=False)
     supervisor_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
+    recommendation_id = db.Column(db.String(36), db.ForeignKey('intervention_recommendations.id'), nullable=True)
+    assigned_to_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=True)
     type = db.Column(db.String(100), nullable=False) # mentorship, counseling, tutoring, warning
     status = db.Column(db.String(20), default='open') # open, closed
     notes = db.Column(db.Text)
+    due_date = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     student = db.relationship('Student', backref=db.backref('interventions', lazy=True))
-    supervisor = db.relationship('User', backref=db.backref('supervised_interventions', lazy=True))
+    supervisor = db.relationship('User', foreign_keys=[supervisor_id], backref=db.backref('supervised_interventions', lazy=True))
+    assigned_to = db.relationship('User', foreign_keys=[assigned_to_id], backref=db.backref('assigned_interventions', lazy=True))
+    recommendation = db.relationship('InterventionRecommendation', backref=db.backref('linked_intervention', uselist=False))
 
 class InterventionOutcome(db.Model):
     __tablename__ = 'intervention_outcomes'
@@ -66,8 +71,69 @@ class InterventionOutcome(db.Model):
     intervention_id = db.Column(db.String(36), db.ForeignKey('interventions.id'), nullable=False)
     outcome_notes = db.Column(db.Text)
     success_rating = db.Column(db.Integer) # 1-5
+    
+    # Before vs After Snapshots
+    risk_level_before = db.Column(db.String(20))
+    risk_level_after = db.Column(db.String(20))
+    gpa_before = db.Column(db.Float)
+    gpa_after = db.Column(db.Float)
+    attendance_before = db.Column(db.Float)
+    attendance_after = db.Column(db.Float)
+    engagement_before = db.Column(db.Float)
+    engagement_after = db.Column(db.Float)
+    
+    effectiveness_score = db.Column(db.Float)
+    completed_by_id = db.Column(db.String(36), db.ForeignKey('users.id'))
     follow_up_date = db.Column(db.DateTime)
+    completion_date = db.Column(db.DateTime)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    intervention = db.relationship('Intervention', backref=db.backref('outcome', uselist=False))
+    completed_by = db.relationship('User', backref=db.backref('completed_intervention_outcomes', lazy=True))
+
+class InterventionTemplate(db.Model):
+    __tablename__ = 'intervention_templates'
+    id = db.Column(db.String(36), primary_key=True, default=generate_uuid)
+    name = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text)
+    intervention_type = db.Column(db.String(50), nullable=False) # mentorship, counseling, tutoring, warning, financial
+    priority = db.Column(db.String(20), default='Medium') # Low, Medium, High, Critical
+    suggested_duration_days = db.Column(db.Integer, default=30)
+    responsible_role = db.Column(db.String(50)) # supervisor, counselor, teacher, finance
+    is_active = db.Column(db.Boolean, default=True)
+    version = db.Column(db.Integer, default=1)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class InterventionRecommendation(db.Model):
+    __tablename__ = 'intervention_recommendations'
+    id = db.Column(db.String(36), primary_key=True, default=generate_uuid)
+    student_id = db.Column(db.String(36), db.ForeignKey('students.id'), nullable=False)
+    risk_prediction_id = db.Column(db.String(36), db.ForeignKey('risk_predictions.id'), nullable=False)
+    template_id = db.Column(db.String(36), db.ForeignKey('intervention_templates.id'))
+    status = db.Column(db.String(20), default='pending') # pending, approved, modified, rejected
+    supervisor_id = db.Column(db.String(36), db.ForeignKey('users.id')) # supervisor who reviewed it
+    supervisor_notes = db.Column(db.Text)
+    confidence_score = db.Column(db.Float)
+    urgency_score = db.Column(db.Float)
+    predicted_effectiveness = db.Column(db.Float)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    student = db.relationship('Student', backref=db.backref('recommendations', lazy=True))
+    prediction = db.relationship('RiskPrediction', backref=db.backref('recommendations', lazy=True))
+    template = db.relationship('InterventionTemplate', backref=db.backref('recommendations', lazy=True))
+    supervisor = db.relationship('User', backref=db.backref('reviewed_recommendations', lazy=True))
+
+class RecommendationEvidence(db.Model):
+    __tablename__ = 'recommendation_evidence'
+    id = db.Column(db.String(36), primary_key=True, default=generate_uuid)
+    recommendation_id = db.Column(db.String(36), db.ForeignKey('intervention_recommendations.id'), nullable=False)
+    metric_name = db.Column(db.String(100), nullable=False) # attendance, gpa, incidents, finance, engagement
+    current_value = db.Column(db.Float)
+    threshold_value = db.Column(db.Float)
+    trend = db.Column(db.String(50)) # declining, stable, improving
+    details = db.Column(db.JSON)
+    
+    recommendation = db.relationship('InterventionRecommendation', backref=db.backref('evidence', lazy=True))
 
 class Referral(db.Model):
     __tablename__ = 'referrals'
