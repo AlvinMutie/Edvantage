@@ -94,7 +94,32 @@ Optional:
 Always return:
 - Why prediction was made
 - Top contributing features
-- Suggested interventions
+- Suggested interventions (Prescriptive Analytics)
+
+---
+
+# 11. INTERVENTION RECOMMENDATION ENGINE (NEW)
+
+Transforming identification into action through prescriptive intelligence.
+
+## Architecture
+- **RecommendationEngine (Interface)**: Standardizes how prescriptions are generated.
+- **RuleBasedRecommendationEngine**: Current implementation using configurable templates and student risk factors.
+- **LearningRecommendationEngine (Future)**: Planned implementation using historical effectiveness data.
+
+## Workflow
+1. Risk Prediction Generated
+2. Contextual Metrics Analyzed (GPA, Attendance, Behavior, etc.)
+3. Templates Matched via Rule Engine
+4. Prioritized Recommendations Created with Evidence
+5. Supervisor Review & Approval Workflow
+6. Intervention Assignment & Deadline Tracking
+7. Outcome Recording & Effectiveness Analytics
+
+## Scoring Heuristics
+- **Confidence**: Stability of the underlying risk factors.
+- **Urgency**: Severity of metric deviations (e.g., Attendance < 50%).
+- **Predicted Effectiveness**: Historical success rate of the intervention type for the given risk profile.
 
 ---
 

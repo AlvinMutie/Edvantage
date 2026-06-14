@@ -49,11 +49,13 @@ const SupervisorDashboard = () => {
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-8">
             <div>
                 <h1 className="text-3xl font-bold text-white">Supervisor Dashboard</h1>
                 <p className="text-slate-400 mt-2">Manage and monitor your assigned students.</p>
             </div>
+
+            <RecommendationQueue />
 
             <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
                 <div className="p-6 border-b border-slate-800 flex justify-between items-center">
@@ -118,6 +120,10 @@ const SupervisorDashboard = () => {
             </div>
         </div>
     );
+};
+
+export default SupervisorDashboard;
+);
 };
 
 export default SupervisorDashboard;

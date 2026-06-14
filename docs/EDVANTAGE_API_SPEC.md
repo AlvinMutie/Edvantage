@@ -67,7 +67,8 @@ GET /parents
 POST /parents
 GET /parents/{id}
 
-GET /parents/{id}/children
+GET /parents/students
+GET /parents/interventions
 
 ---
 
@@ -144,7 +145,15 @@ GET /interventions
 GET /interventions/{id}
 PUT /interventions/{id}
 
-POST /interventions/{id}/outcome
+GET /interventions/recommendations
+POST /interventions/recommendations/{id}/approve
+POST /interventions/recommendations/{id}/reject
+GET /interventions/templates
+GET /interventions/assigned
+POST /interventions/outcomes
+GET /interventions/analytics/effectiveness
+
+POST /interventions/check-risks
 
 ---
 

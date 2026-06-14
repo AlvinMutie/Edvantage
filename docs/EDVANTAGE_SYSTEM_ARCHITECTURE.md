@@ -33,9 +33,9 @@ Controller Layer → Service Layer → Repository Layer
 
 Responsibilities:
 - API handling
-- Business logic
+- Business logic (Recommendations, Interventions)
 - Authentication
-- Data processing
+- Performance Analytics
 
 ---
 
@@ -44,8 +44,8 @@ Responsibilities:
 Stores:
 - Users
 - Academic data
-- AI predictions
-- Interventions
+- AI predictions & Recommendations
+- Interventions & Outcomes
 - Messages
 
 ---
@@ -55,7 +55,7 @@ Stores:
 Standalone Python module:
 
 Flow:
-Database → Feature Engineering → Model → Prediction API
+Database → Feature Engineering → Model → Prediction → Prescription
 
 ---
 
