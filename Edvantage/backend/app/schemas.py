@@ -55,11 +55,19 @@ class AttendanceSchema(Schema):
     date = fields.Date(required=True)
     status = fields.Str(required=True)
 
+class ModelVersionSchema(Schema):
+    id = fields.Str(dump_only=True)
+    name = fields.Str(required=True)
+    accuracy = fields.Float()
+    is_active = fields.Bool()
+    created_at = fields.DateTime(dump_only=True)
+
 class RiskPredictionSchema(Schema):
     id = fields.Str(dump_only=True)
     student_id = fields.Str(required=True)
     risk_level = fields.Str(required=True)
     probability_score = fields.Float(required=True)
+    model_version_id = fields.Str()
     reasons = fields.Dict()
     created_at = fields.DateTime(dump_only=True)
 

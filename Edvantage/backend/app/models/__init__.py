@@ -1,7 +1,7 @@
 from app.models.user import User, Role, Permission
 from app.models.student import Student, Department, Course, Subject, Semester
 from app.models.performance import Enrollment, Grade, Attendance, Teacher, Supervisor, Counselor
-from app.models.risk import RiskPrediction, Intervention, InterventionOutcome, Referral, CounselingSession
+from app.models.risk import RiskPrediction, Intervention, InterventionOutcome, Referral, CounselingSession, ModelVersion, ModelTrainingLog, FeatureImportance
 from app.models.assignment import Assignment, Submission
 from app.models.notification import Notification, Announcement
 from app.models.message import Message, Conversation

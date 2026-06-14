@@ -5,6 +5,33 @@ from app import db
 def generate_uuid():
     return str(uuid.uuid4())
 
+class ModelVersion(db.Model):
+    __tablename__ = 'model_versions'
+    id = db.Column(db.String(36), primary_key=True, default=generate_uuid)
+    name = db.Column(db.String(100), nullable=False)
+    accuracy = db.Column(db.Float)
+    is_active = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class ModelTrainingLog(db.Model):
+    __tablename__ = 'model_training_logs'
+    id = db.Column(db.String(36), primary_key=True, default=generate_uuid)
+    model_version_id = db.Column(db.String(36), db.ForeignKey('model_versions.id'), nullable=False)
+    dataset_info = db.Column(db.Text)
+    metrics = db.Column(db.JSON)
+    trained_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    version = db.relationship('ModelVersion', backref=db.backref('training_logs', lazy=True))
+
+class FeatureImportance(db.Model):
+    __tablename__ = 'feature_importance'
+    id = db.Column(db.String(36), primary_key=True, default=generate_uuid)
+    model_version_id = db.Column(db.String(36), db.ForeignKey('model_versions.id'), nullable=False)
+    feature_name = db.Column(db.String(100), nullable=False)
+    importance_score = db.Column(db.Float, nullable=False)
+    
+    version = db.relationship('ModelVersion', backref=db.backref('features', lazy=True))
+
 class RiskPrediction(db.Model):
     __tablename__ = 'risk_predictions'
     
@@ -12,11 +39,12 @@ class RiskPrediction(db.Model):
     student_id = db.Column(db.String(36), db.ForeignKey('students.id'), nullable=False)
     risk_level = db.Column(db.String(20), nullable=False) # Low, Medium, High, Critical
     probability_score = db.Column(db.Float, nullable=False)
-    model_version = db.Column(db.String(50))
+    model_version_id = db.Column(db.String(36), db.ForeignKey('model_versions.id'))
     reasons = db.Column(db.JSON) # JSON reasons for prediction
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     student = db.relationship('Student', backref=db.backref('risk_predictions', lazy=True))
+    model_version = db.relationship('ModelVersion', backref=db.backref('predictions', lazy=True))
 
 class Intervention(db.Model):
     __tablename__ = 'interventions'
