@@ -123,7 +123,3 @@ const SupervisorDashboard = () => {
 };
 
 export default SupervisorDashboard;
-);
-};
-
-export default SupervisorDashboard;
