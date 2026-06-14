@@ -73,6 +73,15 @@ def create_app(config_class=Config):
     from app.routes.gamification import gamification_bp
     app.register_blueprint(gamification_bp, url_prefix='/api/gamification')
 
+    from app.routes.behavior import behavior_bp
+    app.register_blueprint(behavior_bp, url_prefix='/api/behavior')
+
+    from app.routes.finance import finance_bp
+    app.register_blueprint(finance_bp, url_prefix='/api/finance')
+
+    from app.routes.engagement import engagement_bp
+    app.register_blueprint(engagement_bp, url_prefix='/api/engagement')
+
     # Import socket events to register them
     from app.services import socket_service
 

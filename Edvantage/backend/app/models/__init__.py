@@ -10,3 +10,6 @@ from app.models.settings import SchoolSettings
 from app.models.audit_log import AuditLog
 from app.models.parent import Parent
 from app.models.saved_filter import SavedFilter
+from app.models.behavior import BehavioralIncident
+from app.models.finance import StudentFinance
+from app.models.engagement import StudentEngagement

@@ -18,6 +18,8 @@ class Parent(db.Model):
     user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
     full_name = db.Column(db.String(100), nullable=False)
     phone = db.Column(db.String(20))
+    last_active = db.Column(db.DateTime)
+    login_count = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     user = db.relationship('User', backref=db.backref('parent_profile', uselist=False))
