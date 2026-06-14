@@ -1,35 +1,72 @@
+import uuid
+from datetime import datetime
 from app import db
+
+def generate_uuid():
+    return str(uuid.uuid4())
+
+class Department(db.Model):
+    __tablename__ = 'departments'
+    id = db.Column(db.String(36), primary_key=True, default=generate_uuid)
+    name = db.Column(db.String(100), unique=True, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class Course(db.Model):
+    __tablename__ = 'courses'
+    id = db.Column(db.String(36), primary_key=True, default=generate_uuid)
+    name = db.Column(db.String(100), nullable=False)
+    department_id = db.Column(db.String(36), db.ForeignKey('departments.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class Subject(db.Model):
+    __tablename__ = 'subjects'
+    id = db.Column(db.String(36), primary_key=True, default=generate_uuid)
+    course_id = db.Column(db.String(36), db.ForeignKey('courses.id'), nullable=False)
+    name = db.Column(db.String(100), nullable=False)
+    credit_units = db.Column(db.Integer, default=3)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class Semester(db.Model):
+    __tablename__ = 'semesters'
+    id = db.Column(db.String(36), primary_key=True, default=generate_uuid)
+    name = db.Column(db.String(50), nullable=False) # e.g., 'Semester 1 2024'
+    academic_year = db.Column(db.String(20), nullable=False)
+    is_active = db.Column(db.Boolean, default=False)
 
 class Student(db.Model):
     __tablename__ = 'students'
     
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    student_id = db.Column(db.String(20), unique=True, nullable=False)
+    id = db.Column(db.String(36), primary_key=True, default=generate_uuid)
+    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
+    admission_number = db.Column(db.String(20), unique=True, nullable=False)
     full_name = db.Column(db.String(100), nullable=False)
-    department = db.Column(db.String(100))
-    current_semester = db.Column(db.Integer)
+    date_of_birth = db.Column(db.Date)
+    gender = db.Column(db.String(10))
+    department_id = db.Column(db.String(36), db.ForeignKey('departments.id'))
+    class_id = db.Column(db.String(50)) # e.g., 'Class A'
+    current_semester = db.Column(db.Integer, default=1)
     gpa = db.Column(db.Float, default=0.0)
-    attendance = db.Column(db.Float, default=100.0)  # Percentage
-    risk_status = db.Column(db.String(20), default='Safe')  # Safe, At Risk
-    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    attendance = db.Column(db.Float, default=100.0)
+    risk_status = db.Column(db.String(20), default='Low') # Low, Medium, High, Critical
+    status = db.Column(db.String(20), default='active') # active, graduated, suspended
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_deleted = db.Column(db.Boolean, default=False)
     
-    # Relationship to Supervisor (User)
-    supervisor_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
-    supervisor = db.relationship('User', foreign_keys=[supervisor_id], backref=db.backref('assigned_students', lazy=True))
-
+    # Relationships
     user = db.relationship('User', foreign_keys=[user_id], backref=db.backref('student_profile', uselist=False))
+    department = db.relationship('Department', backref=db.backref('students', lazy=True))
 
     def to_dict(self):
         return {
             'id': self.id,
-            'student_id': self.student_id,
+            'user_id': self.user_id,
+            'admission_number': self.admission_number,
             'full_name': self.full_name,
-            'department': self.department,
             'current_semester': self.current_semester,
             'gpa': self.gpa,
             'attendance': self.attendance,
             'risk_status': self.risk_status,
-            'user': self.user.to_dict() if self.user else None,
-            'supervisor': self.supervisor.to_dict() if self.supervisor else None
+            'status': self.status,
+            'department': self.department.name if self.department else None,
+            'user': self.user.to_dict() if self.user else None
         }

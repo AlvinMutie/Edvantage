@@ -29,7 +29,7 @@ def manage_rules():
     rules = RiskRule.query.all()
     return jsonify(risk_rules_schema.dump(rules)), 200
 
-@evaluation_bp.route('/evaluate/<int:student_id>', methods=['POST'])
+@evaluation_bp.route('/evaluate/<student_id>', methods=['POST'])
 @jwt_required()
 def evaluate_student(student_id):
     results = EvaluationEngine.evaluate_student(student_id)
@@ -47,8 +47,8 @@ def manage_interventions():
             student_id=data['student_id'],
             supervisor_id=supervisor_id,
             type=data['type'],
-            description=data.get('description'),
-            status='Pending'
+            notes=data.get('description'),
+            status='open'
         )
         db.session.add(intervention)
         db.session.commit()

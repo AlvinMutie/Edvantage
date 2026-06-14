@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from app.models.student import Student
-from app.models.performance import PerformanceRecord
-from app.schemas import StudentSchema, PerformanceRecordSchema
+from app.models.performance import Grade, Attendance
+from app.schemas import StudentSchema, GradeSchema, AttendanceSchema
 from app import db
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.services.audit_service import log_audit
@@ -10,7 +10,8 @@ from app.services.resource_service import get_recommendations
 students_bp = Blueprint('students', __name__)
 student_schema = StudentSchema()
 students_schema = StudentSchema(many=True)
-performance_schema = PerformanceRecordSchema()
+grade_schema = GradeSchema()
+attendance_schema = AttendanceSchema()
 
 @students_bp.route('/me', methods=['GET'])
 @jwt_required()
@@ -27,42 +28,63 @@ def get_students():
     students = Student.query.all()
     return jsonify(students_schema.dump(students)), 200
 
-@students_bp.route('/<int:id>', methods=['GET'])
+@students_bp.route('/<id>', methods=['GET'])
 @jwt_required()
 def get_student(id):
     student = Student.query.get_or_404(id)
     return jsonify(student_schema.dump(student)), 200
 
-@students_bp.route('/<int:id>/performance', methods=['POST'])
+@students_bp.route('/<id>/performance', methods=['POST'])
 @jwt_required()
 def add_performance(id):
     data = request.get_json()
     data['student_id'] = id
-    errors = performance_schema.validate(data)
-    if errors:
-        return jsonify(errors), 400
     
-    record = PerformanceRecord(
-        student_id=id,
-        record_type=data['record_type'],
-        value=data['value'],
-        semester=data.get('semester')
-    )
-    db.session.add(record)
+    record_type = data.get('record_type')
+    if record_type == 'grade':
+        errors = grade_schema.validate(data)
+        if errors:
+            return jsonify(errors), 400
+        
+        record = Grade(
+            student_id=id,
+            subject_id=data['subject_id'],
+            assessment_type=data['assessment_type'],
+            score=data['score'],
+            max_score=data.get('max_score', 100.0)
+        )
+        db.session.add(record)
+        dump_data = grade_schema.dump(record)
+    elif record_type == 'attendance':
+        errors = attendance_schema.validate(data)
+        if errors:
+            return jsonify(errors), 400
+            
+        record = Attendance(
+            student_id=id,
+            subject_id=data['subject_id'],
+            date=data['date'],
+            status=data['status']
+        )
+        db.session.add(record)
+        dump_data = attendance_schema.dump(record)
+    else:
+        return jsonify({"msg": "Invalid record type. Must be 'grade' or 'attendance'"}), 400
+    
     db.session.commit()
     
     current_user_id = get_jwt_identity()
     log_audit(
         action="Add Performance Record",
-        user_id=int(current_user_id),
+        user_id=current_user_id,
         target_type="Student",
         target_id=id,
-        details=f"Added {data['record_type']} record with value {data['value']}"
+        details=f"Added {record_type} record"
     )
     
-    return jsonify(performance_schema.dump(record)), 201
+    return jsonify(dump_data), 201
 
-@students_bp.route('/<int:id>/assign-supervisor', methods=['PUT'])
+@students_bp.route('/<id>/assign-supervisor', methods=['PUT'])
 @jwt_required()
 def assign_supervisor(id):
     """Assign a supervisor to a student"""
@@ -84,7 +106,7 @@ def assign_supervisor(id):
     current_user_id = get_jwt_identity()
     log_audit(
         action="Assign Supervisor",
-        user_id=int(current_user_id),
+        user_id=current_user_id,
         target_type="Student",
         target_id=id,
         details=f"Assigned supervisor {supervisor_id} (previous: {old_supervisor_id})"

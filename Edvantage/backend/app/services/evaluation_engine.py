@@ -1,5 +1,5 @@
 from app.models.student import Student
-from app.models.performance import PerformanceRecord
+from app.models.performance import Grade, Attendance
 from app.models.risk import RiskRule, Intervention
 from app import db
 
@@ -11,14 +11,15 @@ class EvaluationEngine:
             return None
         
         # Fetch latest records
-        records = PerformanceRecord.query.filter_by(student_id=student_id).all()
+        grades = Grade.query.filter_by(student_id=student_id).all()
+        attendance_records = Attendance.query.filter_by(student_id=student_id).all()
         
         # Calculate heuristics (e.g., average attendance, latest GPA)
-        attendance_records = [r.value for r in records if r.record_type == 'attendance']
-        grade_records = [r.value for r in records if r.record_type == 'grade']
+        attendance_values = [100 if r.status == 'present' else 0 for r in attendance_records]
+        grade_values = [r.score for r in grades]
         
-        avg_attendance = sum(attendance_records) / len(attendance_records) if attendance_records else 100
-        avg_grade = sum(grade_records) / len(grade_records) if grade_records else 100
+        avg_attendance = sum(attendance_values) / len(attendance_values) if attendance_values else 100
+        avg_grade = sum(grade_values) / len(grade_values) if grade_values else 100
         
         # Fetch rules
         rules = RiskRule.query.all()

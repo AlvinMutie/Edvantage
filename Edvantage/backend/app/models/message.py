@@ -1,34 +1,36 @@
-from app import db
+import uuid
 from datetime import datetime
+from app import db
+
+def generate_uuid():
+    return str(uuid.uuid4())
+
+class Conversation(db.Model):
+    __tablename__ = 'conversations'
+    id = db.Column(db.String(36), primary_key=True, default=generate_uuid)
+    participant_1 = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
+    participant_2 = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 class Message(db.Model):
     __tablename__ = 'messages'
-
-    id = db.Column(db.Integer, primary_key=True)
-    sender_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    receiver_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    content = db.Column(db.Text, nullable=False)
+    
+    id = db.Column(db.String(36), primary_key=True, default=generate_uuid)
+    conversation_id = db.Column(db.String(36), db.ForeignKey('conversations.id'), nullable=False)
+    sender_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
+    message = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-    is_delivered = db.Column(db.Boolean, default=False)
-    is_read = db.Column(db.Boolean, default=False)
-    is_edited = db.Column(db.Boolean, default=False)
-    attachment_url = db.Column(db.String(500), nullable=True)
-
-    # Relationships
-    sender = db.relationship('User', foreign_keys=[sender_id], backref=db.backref('sent_messages', lazy=True))
-    receiver = db.relationship('User', foreign_keys=[receiver_id], backref=db.backref('received_messages', lazy=True))
+    read_status = db.Column(db.Boolean, default=False)
+    
+    sender = db.relationship('User', foreign_keys=[sender_id])
+    conversation = db.relationship('Conversation', backref=db.backref('messages', lazy=True))
 
     def to_dict(self):
         return {
             'id': self.id,
+            'conversation_id': self.conversation_id,
             'sender_id': self.sender_id,
-            'sender_name': self.sender.username if self.sender else 'Unknown',
-            'receiver_id': self.receiver_id,
-            'receiver_name': self.receiver.username if self.receiver else 'Unknown',
-            'content': self.content,
+            'message': self.message,
             'timestamp': self.timestamp.isoformat(),
-            'is_delivered': self.is_delivered,
-            'is_read': self.is_read,
-            'is_edited': self.is_edited,
-            'attachment_url': self.attachment_url
+            'read_status': self.read_status
         }

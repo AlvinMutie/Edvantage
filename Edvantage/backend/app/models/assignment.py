@@ -1,32 +1,31 @@
+import uuid
+from datetime import datetime
 from app import db
+
+def generate_uuid():
+    return str(uuid.uuid4())
 
 class Assignment(db.Model):
     __tablename__ = 'assignments'
     
-    id = db.Column(db.Integer, primary_key=True)
-    student_id = db.Column(db.Integer, db.ForeignKey('students.id'), nullable=False)
-    course_name = db.Column(db.String(100), nullable=False)
+    id = db.Column(db.String(36), primary_key=True, default=generate_uuid)
+    subject_id = db.Column(db.String(36), db.ForeignKey('subjects.id'), nullable=False)
     title = db.Column(db.String(200), nullable=False)
-    score = db.Column(db.Float, nullable=True)  # Actual score received
-    max_score = db.Column(db.Float, default=100.0)  # Total possible points
-    due_date = db.Column(db.DateTime, nullable=True)
-    submitted_date = db.Column(db.DateTime, nullable=True)
-    status = db.Column(db.String(20), default='pending')  # pending, submitted, graded, late
-    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    description = db.Column(db.Text)
+    due_date = db.Column(db.DateTime, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
-    student = db.relationship('Student', backref=db.backref('assignments', lazy=True))
+    subject = db.relationship('Subject', backref=db.backref('assignments', lazy=True))
+
+class Submission(db.Model):
+    __tablename__ = 'submissions'
     
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'student_id': self.student_id,
-            'course_name': self.course_name,
-            'title': self.title,
-            'score': self.score,
-            'max_score': self.max_score,
-            'percentage': round((self.score / self.max_score) * 100, 1) if self.score else None,
-            'due_date': self.due_date.isoformat() if self.due_date else None,
-            'submitted_date': self.submitted_date.isoformat() if self.submitted_date else None,
-            'status': self.status,
-            'created_at': self.created_at.isoformat()
-        }
+    id = db.Column(db.String(36), primary_key=True, default=generate_uuid)
+    assignment_id = db.Column(db.String(36), db.ForeignKey('assignments.id'), nullable=False)
+    student_id = db.Column(db.String(36), db.ForeignKey('students.id'), nullable=False)
+    score = db.Column(db.Float)
+    submitted_at = db.Column(db.DateTime, default=datetime.utcnow)
+    status = db.Column(db.String(20), default='on_time')  # on_time, late, missing
+    
+    assignment = db.relationship('Assignment', backref=db.backref('submissions', lazy=True))
+    student = db.relationship('Student', backref=db.backref('submissions', lazy=True))
