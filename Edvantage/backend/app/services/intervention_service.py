@@ -76,11 +76,19 @@ class InterventionRecommendationService:
         
         db.session.add(intervention)
         
-        # Emit event
+        # Emit events
+        from app.services.event_bus import event_bus
         event_bus.emit('RecommendationApproved', {
             'recommendation_id': rec.id,
             'intervention_id': intervention.id,
             'supervisor_id': supervisor_id
+        }, trace_id=rec.trace_id)
+
+        event_bus.emit('InterventionCreated', {
+            'intervention_id': intervention.id,
+            'student_id': intervention.student_id,
+            'type': intervention.type,
+            'assigned_to_id': assigned_to_id
         }, trace_id=rec.trace_id)
 
         db.session.commit()

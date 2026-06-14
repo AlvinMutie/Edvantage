@@ -62,8 +62,13 @@ class InterventionAnalyticsService:
         intervention.status = 'closed'
         db.session.add(outcome)
         
-        # Emit event
+        # Emit events
         from app.services.event_bus import event_bus
+        event_bus.emit('InterventionCompleted', {
+            'intervention_id': intervention.id,
+            'completed_by_id': completed_by_id
+        }, trace_id=intervention.trace_id)
+
         event_bus.emit('InterventionOutcomeRecorded', {
             'intervention_id': intervention.id,
             'effectiveness_score': effectiveness,
