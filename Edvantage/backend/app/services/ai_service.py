@@ -233,6 +233,24 @@ class RiskPredictionService:
             reasons={'factors': reasons}
         )
         db.session.add(prediction)
+        db.session.flush() # Ensure prediction has an ID
+
+        # Trigger Recommendations (Automated Workflow)
+        from app.services.intervention_service import intervention_service
+        context_data = {
+            'gpa': gpa,
+            'attendance': attendance,
+            'late_submissions': late_subs,
+            'missing_submissions': missing_subs,
+            'incident_count': incident_count,
+            'avg_severity': avg_severity,
+            'login_count': login_count,
+            'resource_usage': resource_usage,
+            'participation_score': participation,
+            'fee_balance': fee_balance,
+            'referral_count': referral_count
+        }
+        intervention_service.generate_recommendations(student, prediction, context_data)
         
         # Update student status
         student.risk_status = risk_level
