@@ -117,7 +117,7 @@ def assign_supervisor(id):
         "student": student.to_dict()
     }), 200
 
-@students_bp.route('/<int:id>/recommendations', methods=['GET'])
+@students_bp.route('/<id>/recommendations', methods=['GET'])
 @jwt_required()
 def student_recommendations(id):
     """Get personalized educational resources based on performance"""

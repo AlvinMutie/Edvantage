@@ -26,13 +26,17 @@ class DepartmentSchema(Schema):
 class StudentSchema(Schema):
     id = fields.Str(dump_only=True)
     user_id = fields.Str(required=True)
+    student_id = fields.Str(attribute='admission_number', dump_only=True) # Alias for frontend
     admission_number = fields.Str(required=True)
     full_name = fields.Str(required=True)
     department_id = fields.Str()
+    current_semester = fields.Int()
     gpa = fields.Float()
     attendance = fields.Float()
     risk_status = fields.Str()
+    status = fields.Str()
     user = fields.Nested(UserSchema, dump_only=True)
+    supervisor = fields.Nested(UserSchema, dump_only=True)
 
 class GradeSchema(Schema):
     id = fields.Str(dump_only=True)

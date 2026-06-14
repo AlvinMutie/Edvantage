@@ -117,11 +117,14 @@ const DashboardLayout = ({ children }) => {
 
     const menuItems = [
         { icon: LayoutDashboard, label: 'Overview', path: '/dashboard', roles: ['admin', 'supervisor'] },
-        { icon: LayoutDashboard, label: 'My Dashboard', path: '/dashboard', roles: ['student'] },
+        { icon: LayoutDashboard, label: 'My Dashboard', path: '/dashboard', roles: ['student', 'teacher', 'counselor', 'parent'] },
         { icon: Shield, label: 'Admin Panel', path: '/dashboard', roles: ['superadmin'] },
         { icon: Users, label: 'User Management', path: '/dashboard/users', roles: ['superadmin'] },
-        { icon: Users, label: 'Students', path: '/dashboard/students', roles: ['admin', 'supervisor'] },
-        { icon: MessageSquare, label: 'Messages', path: '/dashboard/messages', roles: ['admin', 'supervisor', 'student'] },
+        { icon: Users, label: 'Students', path: '/dashboard/students', roles: ['admin', 'supervisor', 'teacher', 'counselor'] },
+        { icon: ClipboardCheck, label: 'Attendance', path: '/dashboard/attendance', roles: ['teacher', 'admin'] },
+        { icon: FileText, label: 'Grades', path: '/dashboard/grades', roles: ['teacher', 'admin', 'student', 'parent'] },
+        { icon: ShieldAlert, label: 'Referrals', path: '/dashboard/referrals', roles: ['teacher', 'supervisor', 'counselor'] },
+        { icon: MessageSquare, label: 'Messages', path: '/dashboard/messages', roles: ['admin', 'supervisor', 'student', 'teacher', 'counselor', 'parent'] },
         { icon: FileText, label: 'Risk Rules', path: '/dashboard/risk', roles: ['admin'] },
         { icon: SettingsIcon, label: 'Settings', path: '/dashboard/settings', roles: ['admin', 'superadmin'] },
     ].filter(item => item.roles.includes(user?.role));
