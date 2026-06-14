@@ -7,8 +7,6 @@ app = create_app()
 
 def seed_data():
     with app.app_context():
-        # Create database tables (don't drop all if we want to keep some data, but for full reset:)
-        # db.drop_all()
         db.create_all()
         
         # 1. Create Roles if they don't exist
@@ -22,60 +20,39 @@ def seed_data():
             role_objects[role_name] = role
         db.session.flush()
 
-        # 2. Create Superadmin
+        # 2. Force Create/Update Superadmin
         superadmin = User.query.filter_by(username='superadmin').first()
         if not superadmin:
-            superadmin = User(
-                full_name='System Superadmin',
-                username='superadmin', 
-                email='superadmin@edvantage.com', 
-                role='superadmin',
-                role_id=role_objects['superadmin'].id
-            )
-            superadmin.set_password('superadmin123')
+            superadmin = User(username='superadmin', email='superadmin@edvantage.com', role='superadmin', role_id=role_objects['superadmin'].id, full_name='System Superadmin')
             db.session.add(superadmin)
+        superadmin.set_password('superadmin123')
 
-        # 3. Create Admin
+        # 3. Force Create/Update Admin
         admin = User.query.filter_by(username='admin').first()
         if not admin:
-            admin = User(
-                full_name='Admin User',
-                username='admin', 
-                email='admin@edvantage.com', 
-                role='admin',
-                role_id=role_objects['admin'].id
-            )
-            admin.set_password('admin123')
+            admin = User(username='admin', email='admin@edvantage.com', role='admin', role_id=role_objects['admin'].id, full_name='Admin User')
             db.session.add(admin)
+        admin.set_password('admin123')
 
-        # 4. Create Supervisor
+        # 4. Force Create/Update Supervisor
         supervisor = User.query.filter_by(username='supervisor').first()
         if not supervisor:
-            supervisor = User(
-                full_name='Test Supervisor',
-                username='supervisor', 
-                email='supervisor@edvantage.com', 
-                role='supervisor',
-                role_id=role_objects['supervisor'].id
-            )
-            supervisor.set_password('password123')
+            supervisor = User(username='supervisor', email='supervisor@edvantage.com', role='supervisor', role_id=role_objects['supervisor'].id, full_name='Test Supervisor')
             db.session.add(supervisor)
+        supervisor.set_password('password123')
 
-        # 5. Create Student User
+        # 5. Force Create/Update Student
         student_user = User.query.filter_by(username='student').first()
         if not student_user:
-            student_user = User(
-                full_name='Alice Johnson',
-                username='student', 
-                email='student@edvantage.com', 
-                role='student',
-                role_id=role_objects['student'].id
-            )
-            student_user.set_password('password123')
+            student_user = User(username='student', email='student@edvantage.com', role='student', role_id=role_objects['student'].id, full_name='Alice Johnson')
             db.session.add(student_user)
             db.session.flush()
+        
+        student_user.set_password('password123')
 
-            # Create Student Profile
+        # Ensure student profile exists
+        student = Student.query.filter_by(user_id=student_user.id).first()
+        if not student:
             student = Student(
                 user_id=student_user.id,
                 admission_number='ADM-1001',
@@ -86,17 +63,9 @@ def seed_data():
                 risk_status='Low'
             )
             db.session.add(student)
-        
-        # 6. Add Rules
-        if not RiskRule.query.first():
-            rules = [
-                RiskRule(name='Low Attendance', condition_type='attendance_low', threshold=75.0, risk_level='High'),
-                RiskRule(name='Low GPA', condition_type='gpa_low', threshold=2.5, risk_level='Medium')
-            ]
-            db.session.add_all(rules)
 
         db.session.commit()
-        print("Database seeded successfully!")
+        print("Database credentials synchronized!")
         print("Superadmin: superadmin / superadmin123")
         print("Admin: admin / admin123")
         print("Supervisor: supervisor / password123")
