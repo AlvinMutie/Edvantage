@@ -41,6 +41,7 @@ class RiskPrediction(db.Model):
     probability_score = db.Column(db.Float, nullable=False)
     model_version_id = db.Column(db.String(36), db.ForeignKey('model_versions.id'))
     reasons = db.Column(db.JSON) # JSON reasons for prediction
+    trace_id = db.Column(db.String(36), nullable=True, index=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     student = db.relationship('Student', backref=db.backref('risk_predictions', lazy=True))

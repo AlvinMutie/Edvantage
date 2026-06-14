@@ -70,7 +70,8 @@ class RuleBasedRecommendationEngine(RecommendationEngine):
                 status='pending',
                 confidence_score=confidence,
                 urgency_score=urgency,
-                predicted_effectiveness=effectiveness
+                predicted_effectiveness=effectiveness,
+                trace_id=context_data.get('trace_id')
             )
             
             # Attach evidence objects

@@ -55,11 +55,21 @@ class InterventionAnalyticsService:
             attendance_after=attendance_after,
             effectiveness_score=effectiveness,
             completed_by_id=completed_by_id,
-            completion_date=datetime.utcnow()
+            completion_date=datetime.utcnow(),
+            trace_id=intervention.trace_id
         )
         
         intervention.status = 'closed'
         db.session.add(outcome)
+        
+        # Emit event
+        from app.services.event_bus import event_bus
+        event_bus.emit('InterventionOutcomeRecorded', {
+            'intervention_id': intervention.id,
+            'effectiveness_score': effectiveness,
+            'gpa_delta': (gpa_after - gpa_before) if (gpa_after and gpa_before) else 0
+        }, trace_id=intervention.trace_id)
+
         db.session.commit()
         return outcome
 

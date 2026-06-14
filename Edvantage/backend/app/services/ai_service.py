@@ -224,16 +224,34 @@ class RiskPredictionService:
         # Get active model version
         active_version = ModelVersion.query.filter_by(is_active=True).order_by(ModelVersion.created_at.desc()).first()
         
+        import uuid
+        trace_id = str(uuid.uuid4())
+        
         # Save prediction
         prediction = RiskPrediction(
             student_id=student.id,
             risk_level=risk_level,
             probability_score=probability,
             model_version_id=active_version.id if active_version else None,
-            reasons={'factors': reasons}
+            reasons={'factors': reasons},
+            trace_id=trace_id
         )
         db.session.add(prediction)
         db.session.flush() # Ensure prediction has an ID
+
+        # Emit Event
+        from app.services.event_bus import event_bus
+        event_bus.emit('RiskPredictionGenerated', {
+            'student_id': student.id,
+            'risk_level': risk_level,
+            'probability': probability,
+            'factors': {
+                'gpa': gpa,
+                'attendance': attendance,
+                'fee_balance': fee_balance,
+                'incident_count': incident_count
+            }
+        }, trace_id=trace_id)
 
         # Trigger Recommendations (Automated Workflow)
         from app.services.intervention_service import intervention_service
@@ -248,7 +266,8 @@ class RiskPredictionService:
             'resource_usage': resource_usage,
             'participation_score': participation,
             'fee_balance': fee_balance,
-            'referral_count': referral_count
+            'referral_count': referral_count,
+            'trace_id': trace_id
         }
         intervention_service.generate_recommendations(student, prediction, context_data)
         

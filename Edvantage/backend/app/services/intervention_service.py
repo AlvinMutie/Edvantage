@@ -18,10 +18,17 @@ class InterventionRecommendationService:
             status='pending'
         ).delete()
         
+        from app.services.event_bus import event_bus
         recommendations = self.engine.get_recommendations(student, risk_prediction, context_data)
         for rec in recommendations:
             db.session.add(rec)
-            # Evidence is already attached to rec in the engine
+            # Emit event for each recommendation
+            event_bus.emit('RecommendationCreated', {
+                'student_id': student.id,
+                'recommendation_id': rec.id,
+                'template_name': rec.template.name if rec.template else 'Custom',
+                'urgency': rec.urgency_score
+            }, trace_id=rec.trace_id)
             
         db.session.commit()
         return recommendations
@@ -30,6 +37,7 @@ class InterventionRecommendationService:
         """
         Approves a recommendation and creates an actual intervention.
         """
+        from app.services.event_bus import event_bus
         rec = InterventionRecommendation.query.get(recommendation_id)
         if not rec or rec.status != 'pending':
             return None
@@ -62,19 +70,37 @@ class InterventionRecommendationService:
             type=template.intervention_type if template else 'General',
             notes=notes or (template.description if template else "Automated intervention"),
             due_date=due_date,
-            status='open'
+            status='open',
+            trace_id=rec.trace_id
         )
         
         db.session.add(intervention)
+        
+        # Emit event
+        event_bus.emit('RecommendationApproved', {
+            'recommendation_id': rec.id,
+            'intervention_id': intervention.id,
+            'supervisor_id': supervisor_id
+        }, trace_id=rec.trace_id)
+
         db.session.commit()
         return intervention
 
     def reject_recommendation(self, recommendation_id, supervisor_id, notes):
+        from app.services.event_bus import event_bus
         rec = InterventionRecommendation.query.get(recommendation_id)
         if rec and rec.status == 'pending':
             rec.status = 'rejected'
             rec.supervisor_id = supervisor_id
             rec.supervisor_notes = notes
+            
+            # Emit event
+            event_bus.emit('RecommendationRejected', {
+                'recommendation_id': rec.id,
+                'supervisor_id': supervisor_id,
+                'notes': notes
+            }, trace_id=rec.trace_id)
+            
             db.session.commit()
             return rec
         return None
