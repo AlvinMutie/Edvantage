@@ -16,7 +16,7 @@ def get_my_badges():
     badges = StudentBadge.query.filter_by(student_id=student.id).all()
     return jsonify([b.to_dict() for b in badges]), 200
 
-@gamification_bp.route('/student/<int:student_id>/badges', methods=['GET'])
+@gamification_bp.route('/student/<student_id>/badges', methods=['GET'])
 @jwt_required()
 def get_student_badges(student_id):
     badges = StudentBadge.query.filter_by(student_id=student_id).all()

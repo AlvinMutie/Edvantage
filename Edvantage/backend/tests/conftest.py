@@ -20,6 +20,15 @@ def app():
     app = create_app(TestConfig)
     with app.app_context():
         db.create_all()
+        
+        # Seed core roles
+        from app.models.user import Role
+        roles = ['superadmin', 'admin', 'teacher', 'supervisor', 'student', 'parent', 'counselor']
+        for r_name in roles:
+            if not Role.query.filter_by(name=r_name).first():
+                db.session.add(Role(name=r_name))
+        db.session.commit()
+        
         yield app
         db.session.remove()
         db.drop_all()

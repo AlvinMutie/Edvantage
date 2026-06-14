@@ -8,3 +8,5 @@ from app.models.message import Message, Conversation
 from app.models.badge import Badge, StudentBadge, Achievement, Leaderboard
 from app.models.settings import SchoolSettings
 from app.models.audit_log import AuditLog
+from app.models.parent import Parent
+from app.models.saved_filter import SavedFilter

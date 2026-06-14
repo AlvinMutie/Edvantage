@@ -16,6 +16,7 @@ class UserSchema(Schema):
     email = fields.Email(required=True)
     role = fields.Str(required=True)
     role_id = fields.Str(required=True)
+    password = fields.Str(load_only=True)
     status = fields.Str()
     created_at = fields.DateTime(dump_only=True)
 

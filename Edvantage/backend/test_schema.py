@@ -7,7 +7,7 @@ app = create_app()
 
 def test_schema_dump():
     with app.app_context():
-        student = Student.query.filter_by(student_id='ST1001').first()
+        student = Student.query.filter_by(admission_number='ST1001').first()
         if not student:
             print("Student ST1001 not found")
             return

@@ -13,7 +13,7 @@ def get_notifications():
     notifications = Notification.query.filter_by(user_id=current_user_id).order_by(Notification.created_at.desc()).limit(20).all()
     return jsonify([n.to_dict() for n in notifications]), 200
 
-@notifications_bp.route('/<int:id>/read', methods=['PUT'])
+@notifications_bp.route('/<id>/read', methods=['PUT'])
 @jwt_required()
 def mark_read(id):
     current_user_id = get_jwt_identity()

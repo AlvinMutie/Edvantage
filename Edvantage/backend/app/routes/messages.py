@@ -133,7 +133,7 @@ def get_conversations():
             
     return jsonify(contacts), 200
 
-@messages_bp.route('/<int:message_id>', methods=['DELETE'])
+@messages_bp.route('/<message_id>', methods=['DELETE'])
 @jwt_required()
 def delete_message(message_id):
     current_user_id = get_jwt_identity()
@@ -147,7 +147,7 @@ def delete_message(message_id):
     db.session.commit()
     return jsonify({'message': 'Message deleted'}), 200
 
-@messages_bp.route('/<int:message_id>', methods=['PUT'])
+@messages_bp.route('/<message_id>', methods=['PUT'])
 @jwt_required()
 def edit_message(message_id):
     current_user_id = get_jwt_identity()
@@ -173,7 +173,7 @@ def edit_message(message_id):
     db.session.commit()
     return jsonify(message.to_dict()), 200
 
-@messages_bp.route('/history/<int:user_id>', methods=['GET'])
+@messages_bp.route('/history/<user_id>', methods=['GET'])
 @jwt_required()
 def get_messages(user_id):
     """Get message history with a specific user"""

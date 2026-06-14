@@ -18,7 +18,7 @@ def get_or_create_student_profile(user_id):
         
     # Check if user exists and is a student
     from app.models.user import User
-    user = User.query.get(int(user_id))
+    user = User.query.get(user_id)
     
     if not user or user.role != 'student':
         return None

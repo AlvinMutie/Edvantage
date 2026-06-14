@@ -3,6 +3,7 @@ import json
 def test_register(client):
     """Test user registration"""
     data = {
+        'full_name': 'Test User',
         'username': 'testuser',
         'email': 'test@example.com',
         'password': 'password123',
@@ -18,6 +19,7 @@ def test_login(client):
     """Test user login"""
     # First register a user
     client.post('/api/auth/register', json={
+        'full_name': 'Login User',
         'username': 'loginuser',
         'email': 'login@example.com',
         'password': 'password123',

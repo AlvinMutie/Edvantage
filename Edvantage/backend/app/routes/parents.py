@@ -21,7 +21,7 @@ def get_parent_students():
 @jwt_required()
 def link_student():
     current_user_id = get_jwt_identity()
-    user = User.query.get(int(current_user_id))
+    user = User.query.get(current_user_id)
     
     if user.role not in ['admin', 'superadmin']:
         return jsonify({"msg": "Unauthorized. Admin access required."}), 403

@@ -8,7 +8,7 @@ from app.services.audit_service import log_audit
 
 assignments_bp = Blueprint('assignments', __name__)
 
-@assignments_bp.route('/student/<int:student_id>', methods=['GET'])
+@assignments_bp.route('/student/<student_id>', methods=['GET'])
 @jwt_required()
 def get_student_assignments(student_id):
     """Get all assignments for a specific student"""
@@ -41,7 +41,7 @@ def create_assignment():
     
     return jsonify(assignment.to_dict()), 201
 
-@assignments_bp.route('/<int:id>', methods=['PUT'])
+@assignments_bp.route('/<id>', methods=['PUT'])
 @jwt_required()
 def update_assignment(id):
     """Update assignment (usually to add grade)"""
@@ -63,7 +63,7 @@ def update_assignment(id):
     current_user_id = get_jwt_identity()
     log_audit(
         action="Update Assignment",
-        user_id=int(current_user_id),
+        user_id=current_user_id,
         target_type="Assignment",
         target_id=id,
         details=f"Updated assignment {id}. Score: {old_score} -> {assignment.score}, Status: {assignment.status}"
@@ -71,7 +71,7 @@ def update_assignment(id):
     
     return jsonify(assignment.to_dict()), 200
 
-@assignments_bp.route('/<int:id>', methods=['DELETE'])
+@assignments_bp.route('/<id>', methods=['DELETE'])
 @jwt_required()
 def delete_assignment(id):
     """Delete an assignment"""

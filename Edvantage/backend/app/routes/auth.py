@@ -67,9 +67,12 @@ def register():
 @auth_bp.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
-    user = User.query.filter_by(username=data.get('username')).first()
+    identifier = data.get('username') # This could be username or email
+    password = data.get('password')
     
-    if user and user.check_password(data.get('password')):
+    user = User.query.filter((User.username == identifier) | (User.email == identifier)).first()
+    
+    if user and user.check_password(password):
         access_token = create_access_token(identity=user.id)
         log_audit("User Login", user_id=user.id, details=f"User {user.username} logged in.")
         return jsonify(access_token=access_token, role=user.role, user_id=user.id), 200
