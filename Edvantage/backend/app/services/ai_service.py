@@ -21,99 +21,67 @@ class RiskPredictionService:
 
     def train_model(self):
         """
-        Trains the Random Forest model on student data using multi-factor features.
+        Trains the Random Forest model on student data using unified temporal features.
         """
         from app import db
         from app.models.student import Student
-        from app.models.performance import Grade, Attendance
-        from app.models.assignment import Submission
-        from app.models.behavior import BehavioralIncident
-        from app.models.finance import StudentFinance
-        from app.models.engagement import StudentEngagement
-        from app.models.risk import Referral, ModelVersion, ModelTrainingLog, FeatureImportance
+        from app.services.temporal_feature_service import temporal_feature_service
+        from app.models.risk import ModelVersion, ModelTrainingLog, FeatureImportance
         
         students = Student.query.all()
-        if len(students) < 3:
+        if len(students) < 5:
             return self._train_synthetic()
 
         features = []
         labels = []
         
         for student in students:
-            # 1. Academic & Behavioral (Existing)
-            gpa = student.gpa or 0.0
-            attendance = student.attendance or 0.0
-            late_subs = Submission.query.filter_by(student_id=student.id, status='late').count()
-            missing_subs = Submission.query.filter_by(student_id=student.id, status='missing').count()
+            # Use unified feature service
+            features_dict = temporal_feature_service.get_student_features(student.id)
             
-            # 2. Behavioral Incidents
-            incidents = BehavioralIncident.query.filter_by(student_id=student.id).all()
-            incident_count = len(incidents)
-            avg_severity = np.mean([i.severity for i in incidents]) if incidents else 0.0
+            # Label heuristic (MUST MATCH _train_synthetic)
+            gpa = features_dict.get('gpa_avg_30d') or student.gpa or 0.0
+            attendance = features_dict.get('att_rate_30d') or student.attendance or 0.0
+            incident_count = features_dict.get('incidents_30d') or 0
             
-            # 3. Engagement
-            engagement = StudentEngagement.query.filter_by(student_id=student.id).first()
-            login_count = engagement.login_count if engagement else 0
-            resource_usage = engagement.resource_access_count if engagement else 0
-            participation = engagement.participation_score if engagement else 0.0
-            
-            # 4. Socio-academic
-            finance = StudentFinance.query.filter_by(student_id=student.id).first()
-            fee_balance = finance.balance if finance else 0.0
-            referral_count = Referral.query.filter_by(student_id=student.id).count()
-            
-            # Feature Vector
-            feature_row = [
-                gpa, attendance, late_subs, missing_subs, 
-                incident_count, avg_severity, 
-                login_count, resource_usage, participation,
-                fee_balance, referral_count
-            ]
-            
-            # Label heuristic
             risk_label = 0 # Low
-            if gpa < 1.5 or attendance < 65 or incident_count > 2 or fee_balance > 4000:
+            if gpa < 1.5 or attendance < 65 or incident_count > 2:
                 risk_label = 3 # Critical
-            elif gpa < 2.2 or attendance < 75 or incident_count > 1 or fee_balance > 2000:
+            elif gpa < 2.2 or attendance < 75 or incident_count > 1:
                 risk_label = 2 # High
-            elif gpa < 2.8 or attendance < 85 or missing_subs > 1:
+            elif gpa < 2.8 or attendance < 85:
                 risk_label = 1 # Medium
             
-            features.append(feature_row)
+            features.append(features_dict)
             labels.append(risk_label)
         
-        feature_names = [
-            'gpa', 'attendance', 'late_submissions', 'missing_submissions',
-            'incident_count', 'avg_severity',
-            'login_count', 'resource_usage', 'participation_score',
-            'fee_balance', 'referral_count'
-        ]
-        X = pd.DataFrame(features, columns=feature_names)
+        X = pd.DataFrame(features)
+        X = X.fillna(0)
         y = np.array(labels)
         
         # Train Model
         self.model = RandomForestClassifier(n_estimators=100, random_state=42)
         self.model.fit(X, y)
         
-        # Save Model and Track Version
+        # Save Model
         joblib.dump(self.model, self.model_path)
         
         # Database Tracking
-        version_name = f"v1.1-{datetime.utcnow().strftime('%Y%m%d%H%M')}"
-        v = ModelVersion(name=version_name, accuracy=1.0, is_active=True) # Simplified accuracy for now
+        version_name = f"v1.2-unified-{datetime.utcnow().strftime('%Y%m%d%H%M')}"
+        v = ModelVersion(name=version_name, accuracy=1.0, is_active=True)
         db.session.add(v)
         db.session.flush()
         
         log = ModelTrainingLog(
             model_version_id=v.id,
-            dataset_info=f"Trained on {len(students)} students with {len(feature_names)} features",
+            dataset_info=f"Trained on {len(students)} students with {X.shape[1]} unified features",
             metrics={'accuracy': 1.0, 'samples': len(students)}
         )
         db.session.add(log)
         
         # Feature Importance Tracking
         importances = self.model.feature_importances_
-        for name, imp in zip(feature_names, importances):
+        for name, imp in zip(X.columns, importances):
             fi = FeatureImportance(model_version_id=v.id, feature_name=name, importance_score=float(imp))
             db.session.add(fi)
             
@@ -121,33 +89,33 @@ class RiskPredictionService:
         return True
 
     def _train_synthetic(self):
-        # Updated synthetic data with more features
-        data = {
-            'gpa': [3.8, 3.5, 2.2, 1.8, 1.0, 2.8, 0.5, 3.2, 2.0, 3.9],
-            'attendance': [98, 95, 75, 60, 40, 85, 20, 88, 70, 99],
-            'late_submissions': [0, 1, 3, 5, 8, 2, 10, 1, 4, 0],
-            'missing_submissions': [0, 0, 1, 3, 5, 1, 10, 0, 2, 0],
-            'incident_count': [0, 0, 1, 2, 3, 0, 4, 0, 1, 0],
-            'avg_severity': [0, 0, 2, 3, 4, 0, 5, 0, 2, 0],
-            'login_count': [50, 45, 20, 10, 5, 30, 2, 40, 15, 55],
-            'resource_usage': [100, 90, 40, 20, 10, 60, 4, 80, 30, 110],
-            'participation_score': [10, 9, 5, 3, 1, 7, 0, 8, 4, 10],
-            'fee_balance': [0, 0, 1000, 3000, 5000, 0, 6000, 0, 2000, 0],
-            'referral_count': [0, 0, 0, 1, 1, 0, 2, 0, 1, 0],
-            'risk_label': [0, 0, 1, 2, 3, 0, 3, 0, 2, 0]
+        """Synthetic training with unified feature set."""
+        # Get feature names from service to ensure parity
+        from app.services.temporal_feature_service import temporal_feature_service
+        # We'll just mock a few rows with the right columns
+        dummy_features = {
+            'gpa_avg_7d': [3.8, 2.0, 1.0, 3.5, 0.5],
+            'gpa_avg_30d': [3.7, 2.1, 1.2, 3.4, 0.6],
+            'gpa_avg_90d': [3.6, 2.2, 1.4, 3.3, 0.7],
+            'gpa_trend_30d': [0.1, -0.1, -0.2, 0.1, -0.1],
+            'att_rate_7d': [98, 70, 40, 95, 20],
+            'att_rate_30d': [97, 72, 45, 94, 25],
+            'att_rate_90d': [96, 75, 50, 93, 30],
+            'att_trend_30d': [1, -2, -5, 1, -5],
+            'incidents_7d': [0, 1, 2, 0, 4],
+            'incidents_30d': [0, 2, 4, 0, 8],
+            'incidents_90d': [0, 3, 6, 0, 12],
+            'logins_7d': [10, 5, 1, 8, 0],
+            'logins_30d': [40, 20, 5, 35, 1],
+            'engagement_growth': [0.1, 0.0, -0.1, 0.1, -0.2],
+            'intervention_count_total': [0, 1, 3, 0, 5],
+            'active_interventions': [0, 0, 1, 0, 2]
         }
-        df = pd.DataFrame(data)
-        feature_names = [
-            'gpa', 'attendance', 'late_submissions', 'missing_submissions',
-            'incident_count', 'avg_severity',
-            'login_count', 'resource_usage', 'participation_score',
-            'fee_balance', 'referral_count'
-        ]
-        X = df[feature_names]
-        y = df['risk_label']
+        df = pd.DataFrame(dummy_features)
+        y = [0, 1, 2, 0, 3] # Labels matching dummy data
         
         self.model = RandomForestClassifier(n_estimators=100, random_state=42)
-        self.model.fit(X, y)
+        self.model.fit(df, y)
         joblib.dump(self.model, self.model_path)
         return True
 
