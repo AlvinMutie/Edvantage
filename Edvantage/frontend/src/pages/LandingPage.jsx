@@ -15,7 +15,10 @@ import {
   Target,
   ChevronRight,
   LayoutDashboard,
-  AlertCircle
+  AlertCircle,
+  Globe,
+  Database,
+  Cpu
 } from 'lucide-react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 
@@ -44,13 +47,22 @@ const LandingPage = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const navLinks = [
+    { name: 'Home', href: '#home' },
+    { name: 'How it works', href: '#how-it-works' },
+    { name: 'Features', href: '#features' },
+    { name: 'AI Tech', href: '#ai-tech' },
+    { name: 'Benefits', href: '#benefits' },
+    { name: 'Reviews', href: '#reviews' },
+  ];
+
   return (
     <div className="min-h-screen bg-[#020617] text-slate-50 overflow-hidden selection:bg-primary-500/30">
       
-      {/* Ambient Background */}
+      {/* Ambient Global Background */}
       <div className="fixed inset-0 pointer-events-none -z-10">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary-600/10 rounded-full blur-[120px] animate-pulse"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-600/10 rounded-full blur-[120px] animate-pulse delay-1000"></div>
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary-600/5 rounded-full blur-[120px]"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-600/5 rounded-full blur-[120px]"></div>
       </div>
 
       {/* Navbar */}
@@ -61,10 +73,12 @@ const LandingPage = () => {
             <span className="text-2xl font-black tracking-tighter">EdVantage<span className="text-primary-500">.</span></span>
           </div>
           
-          <div className="hidden lg:flex items-center gap-10 text-sm font-bold text-slate-400">
-            <a href="#features" className="hover:text-white transition-colors">Features</a>
-            <a href="#how-it-works" className="hover:text-white transition-colors">How it Works</a>
-            <a href="#ai-intelligence" className="hover:text-white transition-colors">AI Intelligence</a>
+          <div className="hidden lg:flex items-center gap-8 text-sm font-bold text-slate-400">
+            {navLinks.map((link) => (
+              <a key={link.name} href={link.href} className="hover:text-white transition-colors">
+                {link.name}
+              </a>
+            ))}
           </div>
 
           <div className="flex items-center gap-4">
@@ -79,18 +93,17 @@ const LandingPage = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-48 pb-20 lg:pt-64 lg:pb-32 px-6">
+      <section id="home" className="relative pt-48 pb-20 lg:pt-64 lg:pb-32 px-6 overflow-hidden">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
           <div className="space-y-8 animate-slide-up">
-            <Badge variant="info" className="mb-4">v2.0 Now Live</Badge>
             <h1 className="text-6xl lg:text-7xl font-black tracking-tight leading-[0.9]">
               Predict Student Risk <br />
-              <span className="text-gradient">Before It Becomes Failure.</span>
+              <span className="text-gradient">Before Failure.</span>
             </h1>
             <p className="text-xl text-slate-400 max-w-xl leading-relaxed">
-              EdVantage uses Artificial Intelligence, Predictive Analytics, and Early Intervention Workflows to help institutions improve student success, retention, and academic performance.
+              EdVantage uses Artificial Intelligence and Predictive Analytics to help institutions improve student success, retention, and performance.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <Button variant="solid" size="lg" className="gap-2">
                 Request Demo <ArrowRight size={20} />
               </Button>
@@ -146,7 +159,6 @@ const LandingPage = () => {
               </div>
             </Card>
             
-            {/* Floating elements for "Enterprise" look */}
             <div className="absolute -top-6 -right-6 p-4 bg-slate-900 border border-white/10 rounded-2xl shadow-2xl animate-bounce duration-[3000ms]">
               <div className="flex items-center gap-3">
                 <Brain size={20} className="text-primary-400" />
@@ -182,63 +194,65 @@ const LandingPage = () => {
       </section>
 
       {/* How It Works */}
-      <section id="how-it-works" className="py-32 px-6">
+      <section id="how-it-works" className="py-32 px-6 relative">
+        <div className="absolute inset-0 bg-blue-600/[0.02] -z-10"></div>
         <div className="max-w-7xl mx-auto text-center mb-20">
           <Badge variant="info" className="mb-6">Methodology</Badge>
           <h2 className="text-5xl font-black tracking-tight mb-6">How It Works</h2>
-          <p className="text-slate-400 max-w-2xl mx-auto text-lg">Our streamlined process turns raw student data into measurable success stories.</p>
+          <p className="text-slate-400 max-w-2xl mx-auto text-lg font-medium">Our process turns raw student data into measurable success stories.</p>
         </div>
 
         <div className="max-w-5xl mx-auto grid md:grid-cols-4 gap-8 relative">
           {[
-            { title: 'Data Collection', desc: 'LMS, SIS, and Engagement data.', icon: BarChart3 },
-            { title: 'AI Analysis', desc: 'Risk scoring via neural networks.', icon: Brain },
-            { title: 'Intervention', desc: 'Automated workflow triggers.', icon: Zap },
-            { title: 'Improved Outcomes', desc: 'Measured success & graduation.', icon: Target },
+            { title: 'Collection', desc: 'Sync LMS and SIS data.', icon: Database },
+            { title: 'Analysis', desc: 'AI-powered risk scoring.', icon: Brain },
+            { title: 'Action', desc: 'Trigger support workflows.', icon: Zap },
+            { title: 'Success', desc: 'Measured student outcomes.', icon: Target },
           ].map((item, i) => (
             <div key={i} className="relative group text-center space-y-6">
-              <div className="w-20 h-20 mx-auto bg-primary-600/10 rounded-[2rem] border border-primary-500/20 flex items-center justify-center relative z-10 group-hover:bg-primary-600/20 transition-all">
+              <div className="w-20 h-20 mx-auto bg-primary-600/10 rounded-[2rem] border border-primary-500/20 flex items-center justify-center relative z-10 group-hover:bg-primary-600/20 transition-all shadow-lg">
                 <item.icon size={32} className="text-primary-400" />
                 {i < 3 && (
                   <div className="hidden md:block absolute top-1/2 left-[120%] w-full h-[2px] bg-gradient-to-r from-primary-500/20 to-transparent -translate-y-1/2"></div>
                 )}
               </div>
-              <h4 className="text-xl font-bold text-white">{item.title}</h4>
-              <p className="text-slate-400 text-sm leading-relaxed">{item.desc}</p>
+              <h4 className="text-xl font-bold text-white tracking-tight">{item.title}</h4>
+              <p className="text-slate-400 text-sm leading-relaxed font-medium">{item.desc}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-32 px-6 bg-slate-950/30">
+      <section id="features" className="py-32 px-6 bg-slate-950/30 relative">
+        <div className="absolute inset-0 bg-indigo-600/[0.03] -z-10"></div>
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
             <div className="max-w-2xl">
               <Badge variant="info" className="mb-6">Capabilities</Badge>
-              <h2 className="text-5xl font-black tracking-tight text-white mb-6">Intelligence Built for Impact.</h2>
-              <p className="text-slate-400 text-lg">Comprehensive tools to manage every aspect of the student lifecycle with data-driven precision.</p>
+              <h2 className="text-5xl font-black tracking-tight text-white mb-6 leading-tight">Intelligence Built for Impact.</h2>
+              <p className="text-slate-400 text-lg font-medium">Tools to manage every aspect of the student lifecycle with precision.</p>
             </div>
             <Button variant="outline" className="mb-2">View All Features</Button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { title: 'AI Risk Prediction', desc: 'Predict failure with 91.7% accuracy before it happens.', icon: Brain },
-              { title: 'Explainable AI', desc: 'Understand the "Why" behind every risk score.', icon: AlertCircle },
-              { title: 'Intervention Engine', desc: 'Smart workflows for counselors and teachers.', icon: Zap },
-              { title: 'Parent Engagement', desc: 'Keep families informed with automated updates.', icon: Users },
-              { title: 'Counselor Workflow', desc: 'Prioritized case management for support staff.', icon: LayoutDashboard },
-              { title: 'Institutional Analytics', desc: 'Bird-eye view of your entire school health.', icon: BarChart3 },
-              { title: 'Predictive Insights', desc: 'Forecast future enrollment and performance.', icon: TrendingUp },
-              { title: 'Real-Time Monitoring', desc: 'Live alerts when engagement drops below baseline.', icon: Clock },
+              { title: 'Risk Prediction', desc: 'Identify failure patterns with 91.7% accuracy.', icon: Brain },
+              { title: 'Clear Reasoning', desc: 'Understand the "Why" behind every risk score.', icon: AlertCircle },
+              { title: 'Support Workflow', desc: 'Smart tasks for counselors and teachers.', icon: Zap },
+              { title: 'Parent Portal', desc: 'Keep families informed with automated updates.', icon: Users },
+              { title: 'Case Management', desc: 'Prioritized task list for support staff.', icon: LayoutDashboard },
+              { title: 'School Analytics', desc: 'Bird-eye view of your entire school health.', icon: BarChart3 },
+              { title: 'Future Insights', desc: 'Forecast future enrollment and performance.', icon: TrendingUp },
+              { title: 'Live Alerts', desc: 'Real-time notifications for critical events.', icon: Clock },
             ].map((feature, i) => (
-              <Card key={i} className="p-8 hover:-translate-y-2 transition-transform">
+              <Card key={i} className="p-8 hover:-translate-y-2 transition-transform bg-slate-900/40 border-white/5">
                 <div className="p-3 bg-white/5 rounded-2xl w-fit mb-6">
                   <feature.icon size={24} className="text-primary-400" />
                 </div>
-                <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
-                <p className="text-slate-400 text-sm leading-relaxed">{feature.desc}</p>
+                <h3 className="text-xl font-bold text-white mb-3 tracking-tight">{feature.title}</h3>
+                <p className="text-slate-400 text-sm leading-relaxed font-medium">{feature.desc}</p>
               </Card>
             ))}
           </div>
@@ -246,17 +260,18 @@ const LandingPage = () => {
       </section>
 
       {/* AI Intelligence Showcase */}
-      <section id="ai-intelligence" className="py-32 px-6">
+      <section id="ai-tech" className="py-32 px-6 relative">
+        <div className="absolute inset-0 bg-purple-600/[0.02] -z-10"></div>
         <div className="max-w-7xl mx-auto">
-          <Card className="p-12 lg:p-20 bg-gradient-to-br from-indigo-900/40 to-slate-900/40 border-white/10">
+          <Card className="p-12 lg:p-20 bg-gradient-to-br from-indigo-900/40 to-slate-900/40 border-white/10 shadow-2xl">
             <div className="grid lg:grid-cols-2 gap-20 items-center">
               <div className="space-y-8">
                 <Badge variant="info">Explainable AI</Badge>
                 <h2 className="text-5xl font-black tracking-tight leading-tight">
                   Transparent <br /> Intelligence.
                 </h2>
-                <p className="text-slate-400 text-lg leading-relaxed">
-                  We believe AI shouldn't be a black box. EdVantage provides clear reasoning for every risk prediction, enabling counselors to take more effective, personalized actions.
+                <p className="text-slate-400 text-lg leading-relaxed font-medium">
+                  We believe AI shouldn't be a black box. EdVantage provides clear reasoning for every prediction, enabling more effective, personalized actions.
                 </p>
                 <div className="space-y-4">
                   {[
@@ -277,8 +292,8 @@ const LandingPage = () => {
                 <Card className="p-8 bg-slate-950/50 border-white/10 shadow-2xl">
                   <div className="flex items-center justify-between mb-8">
                     <div>
-                      <h4 className="font-black text-xl mb-1">Student Risk Score</h4>
-                      <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">Student ID: #88291</p>
+                      <h4 className="font-black text-xl mb-1 tracking-tight">Student Risk Score</h4>
+                      <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">ID: #88291</p>
                     </div>
                     <div className="text-right">
                       <div className="text-3xl font-black text-risk-critical">84.2%</div>
@@ -316,24 +331,25 @@ const LandingPage = () => {
       </section>
 
       {/* Why Choose EdVantage */}
-      <section className="py-32 px-6 bg-slate-950/50">
+      <section id="benefits" className="py-32 px-6 bg-slate-950/50 relative">
+        <div className="absolute inset-0 bg-emerald-600/[0.02] -z-10"></div>
         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-20">
           <div>
             <Badge variant="info" className="mb-6">Strategic Value</Badge>
-            <h2 className="text-5xl font-black tracking-tight mb-8">Why Choose <br /> EdVantage?</h2>
+            <h2 className="text-5xl font-black tracking-tight mb-8 leading-tight">Why Choose <br /> EdVantage?</h2>
             <div className="grid sm:grid-cols-2 gap-8">
               {[
-                { title: 'Early Detection', desc: 'Identify risk factors 4-6 weeks earlier than traditional methods.', icon: Clock },
+                { title: 'Early Detection', desc: 'Identify risk factors 4-6 weeks earlier than usual.', icon: Clock },
                 { title: 'Data-Driven', desc: 'Move beyond intuition to verifiable data evidence.', icon: BarChart3 },
-                { title: 'Improved Retention', desc: 'Reduce student dropout rates by up to 22% annually.', icon: TrendingUp },
-                { title: 'Student-Centered', desc: 'Support designed around the individual student needs.', icon: Users },
+                { title: 'Retention Boost', desc: 'Reduce student dropout rates by up to 22% annually.', icon: TrendingUp },
+                { title: 'Student-Centered', desc: 'Support designed around individual student needs.', icon: Users },
               ].map((reason, i) => (
                 <div key={i} className="space-y-4">
                   <div className="p-3 bg-primary-600/10 rounded-2xl w-fit">
                     <reason.icon size={24} className="text-primary-400" />
                   </div>
-                  <h4 className="text-xl font-bold">{reason.title}</h4>
-                  <p className="text-slate-400 text-sm leading-relaxed">{reason.desc}</p>
+                  <h4 className="text-xl font-bold tracking-tight text-white">{reason.title}</h4>
+                  <p className="text-slate-400 text-sm leading-relaxed font-medium">{reason.desc}</p>
                 </div>
               ))}
             </div>
@@ -343,21 +359,21 @@ const LandingPage = () => {
                <div className="relative w-full h-full p-12">
                   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary-500/20 blur-[100px] rounded-full"></div>
                   <div className="grid grid-cols-2 gap-4 h-full relative z-10">
-                    <div className="bg-white/5 border border-white/10 rounded-3xl p-6 flex flex-col justify-between">
+                    <div className="bg-white/5 border border-white/10 rounded-3xl p-6 flex flex-col justify-between hover:bg-white/10 transition-colors">
                        <LayoutDashboard className="text-primary-400" size={32} />
-                       <div className="text-2xl font-black">Modern UI</div>
+                       <div className="text-2xl font-black tracking-tight">Modern UI</div>
                     </div>
-                    <div className="bg-white/5 border border-white/10 rounded-3xl p-6 mt-12 flex flex-col justify-between">
+                    <div className="bg-white/5 border border-white/10 rounded-3xl p-6 mt-12 flex flex-col justify-between hover:bg-white/10 transition-colors">
                        <Shield className="text-success-400" size={32} />
-                       <div className="text-2xl font-black">Secure</div>
+                       <div className="text-2xl font-black tracking-tight">Secure</div>
                     </div>
-                    <div className="bg-white/5 border border-white/10 rounded-3xl p-6 -mt-12 flex flex-col justify-between">
+                    <div className="bg-white/5 border border-white/10 rounded-3xl p-6 -mt-12 flex flex-col justify-between hover:bg-white/10 transition-colors">
                        <Zap className="text-amber-400" size={32} />
-                       <div className="text-2xl font-black">Real-time</div>
+                       <div className="text-2xl font-black tracking-tight">Real-time</div>
                     </div>
-                    <div className="bg-white/5 border border-white/10 rounded-3xl p-6 flex flex-col justify-between">
-                       <Brain className="text-purple-400" size={32} />
-                       <div className="text-2xl font-black">AI Powered</div>
+                    <div className="bg-white/5 border border-white/10 rounded-3xl p-6 flex flex-col justify-between hover:bg-white/10 transition-colors">
+                       <Cpu className="text-purple-400" size={32} />
+                       <div className="text-2xl font-black tracking-tight">AI Driven</div>
                     </div>
                   </div>
                </div>
@@ -367,18 +383,19 @@ const LandingPage = () => {
       </section>
 
       {/* Testimonials */}
-      <section className="py-32 px-6">
+      <section id="reviews" className="py-32 px-6 relative">
+        <div className="absolute inset-0 bg-amber-600/[0.02] -z-10"></div>
         <div className="max-w-7xl mx-auto text-center mb-20">
           <Badge variant="info" className="mb-6">Global Trust</Badge>
           <h2 className="text-5xl font-black tracking-tight mb-6">Success Stories</h2>
-          <p className="text-slate-400 max-w-2xl mx-auto text-lg">See how leading institutions are transforming student outcomes.</p>
+          <p className="text-slate-400 max-w-2xl mx-auto text-lg font-medium">Leading institutions transforming student outcomes.</p>
         </div>
 
         <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-8">
           {[
             { 
               name: 'Dr. Sarah Jenkins', 
-              role: 'Director of Student Success', 
+              role: 'Director of Success', 
               inst: 'Westview University',
               text: 'EdVantage has completely changed how our advisors work. We no longer wait for mid-terms to see who is struggling; we know by week two.'
             },
@@ -395,16 +412,16 @@ const LandingPage = () => {
               text: 'The explainable AI feature is the game-changer. It gives my team the exact talking points they need for student interventions.'
             },
           ].map((testimonial, i) => (
-            <Card key={i} className="p-10 flex flex-col justify-between italic text-slate-300">
+            <Card key={i} className="p-10 flex flex-col justify-between italic text-slate-300 bg-slate-900/40 border-white/5">
               <div className="space-y-6">
                 <div className="flex gap-1">
                   {[...Array(5)].map((_, i) => <Zap key={i} size={16} className="text-amber-500 fill-amber-500" />)}
                 </div>
-                <p className="text-lg leading-relaxed">"{testimonial.text}"</p>
+                <p className="text-lg leading-relaxed font-medium">"{testimonial.text}"</p>
               </div>
               <div className="mt-10 pt-10 border-t border-white/5 not-italic">
-                <p className="font-black text-white">{testimonial.name}</p>
-                <p className="text-sm text-slate-500 font-bold">{testimonial.role}, {testimonial.inst}</p>
+                <p className="font-black text-white tracking-tight">{testimonial.name}</p>
+                <p className="text-sm text-slate-500 font-bold uppercase tracking-widest">{testimonial.role}, {testimonial.inst}</p>
               </div>
             </Card>
           ))}
@@ -412,23 +429,23 @@ const LandingPage = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-32 px-6">
+      <section className="py-32 px-6 relative">
         <div className="max-w-7xl mx-auto">
-          <Card className="p-12 lg:p-24 bg-primary-600 relative overflow-hidden text-center space-y-12">
+          <Card className="p-12 lg:p-24 bg-primary-600 relative overflow-hidden text-center space-y-12 shadow-[0_40px_100px_rgba(37,99,235,0.3)]">
             <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
             <div className="absolute -top-24 -right-24 w-96 h-96 bg-white/20 rounded-full blur-[100px]"></div>
             <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-indigo-900/40 rounded-full blur-[100px]"></div>
             
             <div className="relative z-10 max-w-4xl mx-auto space-y-8">
               <h2 className="text-5xl lg:text-7xl font-black tracking-tight text-white leading-tight">
-                Ready to Revolutionize Your <br /> Institutional Intelligence?
+                Ready to Revolutionize <br /> Your Institution?
               </h2>
               <p className="text-primary-100 text-xl font-medium max-w-2xl mx-auto">
                 Join 120+ forward-thinking institutions using EdVantage to empower every student to reach their full potential.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-6">
-                <Button variant="white" size="xl" className="w-full sm:w-auto">Request a Private Demo</Button>
-                <Button variant="outline" size="xl" className="w-full sm:w-auto border-white/20 hover:bg-white/10">Contact Sales Team</Button>
+                <Button variant="white" size="xl" className="w-full sm:w-auto shadow-2xl">Request Private Demo</Button>
+                <Button variant="outline" size="xl" className="w-full sm:w-auto border-white/30 hover:bg-white/10">Contact Sales Team</Button>
               </div>
             </div>
           </Card>
@@ -436,19 +453,52 @@ const LandingPage = () => {
       </section>
 
       {/* Footer */}
-      <footer className="py-20 px-6 border-t border-white/5 bg-slate-950">
+      <footer className="py-20 px-6 border-t border-white/5 bg-[#010413]">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-10">
-            <div className="flex items-center gap-3">
-              <img src={logo} alt="EdVantage" className="h-8 w-8" />
-              <span className="text-xl font-black tracking-tighter">EdVantage<span className="text-primary-500">.</span></span>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-20">
+            <div className="col-span-1 md:col-span-2 space-y-6">
+              <div className="flex items-center gap-3">
+                <img src={logo} alt="EdVantage" className="h-10 w-10" />
+                <span className="text-2xl font-black tracking-tighter">EdVantage<span className="text-primary-500">.</span></span>
+              </div>
+              <p className="text-slate-500 max-w-sm font-medium leading-relaxed">
+                Empowering educational institutions with AI-driven insights to foster student success and institutional growth.
+              </p>
+              <div className="flex gap-4">
+                {[Globe, Database, MessageSquare].map((Icon, i) => (
+                  <div key={i} className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-500 hover:text-white transition-colors cursor-pointer">
+                    <Icon size={18} />
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="flex gap-10 text-sm font-bold text-slate-500">
-              <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
-              <a href="#" className="hover:text-white transition-colors">Security</a>
+            
+            <div>
+              <h4 className="text-white font-black uppercase tracking-widest text-xs mb-6">Platform</h4>
+              <ul className="space-y-4 text-sm font-bold text-slate-500">
+                {navLinks.slice(1).map(link => (
+                  <li key={link.name}><a href={link.href} className="hover:text-primary-400 transition-colors">{link.name}</a></li>
+                ))}
+              </ul>
             </div>
-            <p className="text-xs font-bold text-slate-600 uppercase tracking-widest">© 2026 EdVantage AI Intelligence.</p>
+
+            <div>
+              <h4 className="text-white font-black uppercase tracking-widest text-xs mb-6">Support</h4>
+              <ul className="space-y-4 text-sm font-bold text-slate-500">
+                <li><a href="#" className="hover:text-primary-400 transition-colors">Documentation</a></li>
+                <li><a href="#" className="hover:text-primary-400 transition-colors">Privacy Policy</a></li>
+                <li><a href="#" className="hover:text-primary-400 transition-colors">Terms of Service</a></li>
+                <li><a href="#" className="hover:text-primary-400 transition-colors">Security</a></li>
+              </ul>
+            </div>
+          </div>
+          
+          <div className="pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+            <p className="text-xs font-bold text-slate-600 uppercase tracking-widest">© 2026 EdVantage AI Intelligence Systems.</p>
+            <div className="flex items-center gap-2 px-4 py-2 bg-success-500/10 border border-success-500/20 rounded-full">
+              <div className="w-1.5 h-1.5 rounded-full bg-success-500 animate-pulse"></div>
+              <span className="text-[10px] font-black text-success-500 uppercase tracking-tighter">Systems Operational</span>
+            </div>
           </div>
         </div>
       </footer>
@@ -457,3 +507,4 @@ const LandingPage = () => {
 };
 
 export default LandingPage;
+

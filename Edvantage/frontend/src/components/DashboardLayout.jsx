@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
-import { Button } from './ui/Button';
+import Button from './ui/Button';
 
 const SidebarItem = ({ icon: Icon, label, path, active, collapsed }) => (
     <Link
