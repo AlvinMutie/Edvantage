@@ -1,105 +1,527 @@
-ENTER STRICT PRODUCTION HARDENING & VERIFICATION MODE.
+# EDVANTAGE UI/UX MODERNIZATION DIRECTIVE
 
-Stop generating new features, architecture expansions, or learning claims.
+ENTER AUTONOMOUS UI/UX REDESIGN MODE.
 
-Your only task is to VALIDATE and STRESS-TEST the existing EdVantage system.
+You are now acting as a Senior Product Designer, Senior Frontend Architect, and SaaS UX Consultant.
 
----
-
-# 1. REAL DATA VALIDATION (CRITICAL)
-
-- Use ONLY real or realistically simulated institutional-like data
-- Clearly label any synthetic data
-- Test whether the system still learns when:
-  - data distribution changes
-  - noise is introduced
-  - missing values are present
-
-Output:
-- Does model performance still improve? YES/NO
-- Does it degrade under noise? YES/NO
-
----
-
-# 2. STABILITY & REGRESSION TESTING
-
-Run at least 10 retraining cycles and report:
-
-- Accuracy per cycle
-- F1 score per cycle
-- Any performance collapse or instability
+Your objective is to transform EdVantage from a functional student management platform into a premium enterprise-grade Educational Intelligence Platform.
 
 IMPORTANT:
-Do NOT present single successful runs. Show full trend.
+
+* Do NOT redesign the backend.
+* Do NOT modify ML services.
+* Do NOT modify business logic.
+* Do NOT remove existing functionality.
+* Focus on visual design, UX, information hierarchy, responsiveness, accessibility, and dashboard intelligence presentation.
+* Use the existing technology stack:
+
+  * React 19
+  * Vite
+  * Tailwind CSS 4
+  * Recharts
+  * React Query
+  * Lucide React
 
 ---
 
-# 3. FEATURE CONSISTENCY AUDIT
+# DESIGN PHILOSOPHY
 
-Check:
+EdVantage must look comparable to:
 
-- Are training features EXACTLY identical to prediction features?
-- Any mismatch = FAIL
+* Stripe Dashboard
+* Linear
+* Notion
+* Vercel
+* Power BI
+* HubSpot
+* Microsoft Fabric
 
-Output:
-- PASS or FAIL
-- If FAIL, list exact mismatch fields
+Avoid:
 
----
+* Bootstrap admin template appearance
+* Student project appearance
+* Generic CRUD dashboard appearance
+* Excessive colors
+* Outdated card layouts
+* Cluttered interfaces
 
-# 4. DRIFT RESPONSE TEST
+Design language:
 
-Simulate data drift and evaluate:
-
-- Does model adapt automatically?
-- Or only detect drift without recovery?
-
-Classify:
-- Adaptive
-- Observational only
-- Failing
-
----
-
-# 5. INTERVENTION EFFECTIVENESS VALIDITY
-
-Check if intervention improvements are:
-
-- Causal (confirmed via controlled comparison)
-OR
-- Correlational only
-
-You MUST NOT assume causality unless proven.
+* Premium
+* Enterprise
+* Modern
+* Clean
+* Data-first
+* AI-powered
+* Trustworthy
 
 ---
 
-# 6. ROLLBACK SAFETY TEST
+# GLOBAL DESIGN SYSTEM
 
-Force a degraded model scenario:
+Create or improve:
 
-- Does rollback trigger correctly?
-- Does system continue functioning after rollback?
+## Typography
 
-PASS / FAIL required.
+Hierarchy:
 
----
+* Hero Title
+* Section Title
+* Dashboard Title
+* KPI Label
+* Body Text
+* Helper Text
 
-# 7. FINAL HONEST CLASSIFICATION
-
-Based ONLY on observed test results, classify system as ONE:
-
-- Prototype ML system
-- Functional closed-loop system
-- Experimental adaptive system
-- Validated adaptive system
-- Production-grade autonomous learning system
-
-No marketing language. No assumptions.
+Use consistent spacing and sizing.
 
 ---
 
-# RULE
+## Colors
 
-Do NOT describe intended design.
+Primary:
 
-Only report observed behavior under stress tests.
+* Indigo / Blue enterprise palette
+
+Secondary:
+
+* Emerald success palette
+
+Risk Levels:
+
+Low Risk:
+
+* Green
+
+Medium Risk:
+
+* Amber
+
+High Risk:
+
+* Orange
+
+Critical:
+
+* Red
+
+Neutral:
+
+* Slate palette
+
+Support:
+
+* Dark mode
+* Light mode
+
+---
+
+## Components
+
+Create reusable components:
+
+* KPI Cards
+* Analytics Cards
+* Risk Cards
+* Activity Feed
+* Notification Panel
+* AI Insight Panel
+* Empty States
+* Loading Skeletons
+* Dashboard Header
+* Section Containers
+* Status Badges
+* Progress Indicators
+
+---
+
+# LANDING PAGE REDESIGN
+
+Create a world-class landing page.
+
+Sections:
+
+## Hero Section
+
+Headline:
+
+"Predict Student Risk Before It Becomes Failure"
+
+Subheadline:
+
+"EdVantage uses Artificial Intelligence, Predictive Analytics, and Early Intervention Workflows to help institutions improve student success, retention, and academic performance."
+
+CTA Buttons:
+
+* Request Demo
+* Watch Overview
+
+Right side:
+
+Animated dashboard preview.
+
+---
+
+## Trust Section
+
+Display enterprise statistics.
+
+Examples:
+
+* Students Monitored
+* Institutions Supported
+* Intervention Success Rate
+* Student Retention Improvement
+
+Use animated counters.
+
+---
+
+## How It Works
+
+Visual flow:
+
+Student Data
+→ AI Risk Analysis
+→ Intervention Recommendation
+→ Improved Outcomes
+
+Use infographic-style presentation.
+
+---
+
+## Features Section
+
+Feature Cards:
+
+* AI Risk Prediction
+* Explainable AI
+* Smart Intervention Engine
+* Parent Engagement
+* Counselor Workflow
+* Institutional Analytics
+* Predictive Insights
+* Real-Time Monitoring
+
+---
+
+## AI Intelligence Showcase
+
+Demonstrate:
+
+Student Risk Score
+
+Contributing Factors:
+
+* Attendance Decline
+* GPA Trend Downward
+* Missed Assignments
+* Low Engagement
+
+Present as Explainable AI.
+
+---
+
+## Why Choose EdVantage
+
+Include:
+
+* Early Detection
+* Data-Driven Decisions
+* Improved Retention
+* Student-Centered Support
+
+---
+
+## Testimonials Section
+
+Create professional testimonial cards.
+
+---
+
+## CTA Section
+
+Large enterprise call-to-action.
+
+---
+
+# DASHBOARD REDESIGN
+
+Redesign every dashboard.
+
+All dashboards must use:
+
+* Modern KPI cards
+* Advanced charts
+* Better information hierarchy
+* Responsive layouts
+* Insight panels
+* Empty states
+* Loading states
+
+---
+
+# SUPERADMIN DASHBOARD
+
+Create:
+
+## KPI Row
+
+* Total Institutions
+* Active Users
+* System Health
+* Security Events
+
+## Analytics
+
+* User Growth
+* Platform Activity
+* Risk Trends
+
+## System Monitoring
+
+* Audit Logs
+* Security Alerts
+* Usage Heatmaps
+
+---
+
+# ADMIN DASHBOARD
+
+Create:
+
+## KPI Cards
+
+* Total Students
+* Retention Rate
+* Attendance Rate
+* Average GPA
+
+## Charts
+
+* GPA Trends
+* Attendance Trends
+* Risk Distribution
+* Intervention Success
+
+## AI Insight Feed
+
+Example:
+
+"AI detected increased risk among Year 2 ICT students."
+
+## Institution Health Score
+
+Display score from 0–100.
+
+---
+
+# SUPERVISOR DASHBOARD
+
+Create:
+
+## KPI Cards
+
+* Students Assigned
+* At-Risk Students
+* Active Interventions
+* Success Rate
+
+## Recommended Actions Panel
+
+Show AI recommendations.
+
+Include:
+
+* Student Name
+* Reason
+* Priority
+* Action Buttons
+
+## Risk Monitoring
+
+Risk distribution charts.
+
+## Student Activity Feed
+
+Recent updates.
+
+---
+
+# COUNSELOR DASHBOARD
+
+Create:
+
+## KPI Cards
+
+* Active Cases
+* Referrals
+* Sessions Scheduled
+* Success Rate
+
+## Referral Queue
+
+Prioritized by urgency.
+
+## Case Management Panel
+
+Display:
+
+* Student Profile
+* Risk Factors
+* Session History
+* Intervention Progress
+
+---
+
+# STUDENT DASHBOARD
+
+Create:
+
+## Welcome Section
+
+Personalized greeting.
+
+## KPI Cards
+
+* GPA
+* Attendance
+* Risk Level
+* Achievements
+
+## Analytics
+
+* GPA Trend
+* Attendance Trend
+
+## Gamification
+
+Achievements
+Badges
+Progress Levels
+
+## Goals Section
+
+Academic goals tracking.
+
+---
+
+# PARENT DASHBOARD
+
+Create:
+
+## Student Overview
+
+* GPA
+* Attendance
+* Risk Level
+
+## Timeline
+
+Show:
+
+* Risk Changes
+* Interventions
+* Meetings
+* Improvements
+
+## Recommended Parent Actions
+
+Provide actionable guidance.
+
+---
+
+# AI INSIGHTS SYSTEM
+
+Across all dashboards create:
+
+AI Insights Panel
+
+Examples:
+
+"Attendance risk increased by 8% this week."
+
+"Three students require intervention review."
+
+"Intervention effectiveness improved by 12%."
+
+---
+
+# ANALYTICS VISUALIZATION
+
+Use Recharts extensively.
+
+Implement:
+
+* Area Charts
+* Line Charts
+* Bar Charts
+* Pie Charts
+* Risk Distribution Charts
+* Trend Charts
+
+Create visually rich dashboards.
+
+---
+
+# RESPONSIVENESS
+
+Ensure:
+
+* Desktop
+* Tablet
+* Mobile
+
+All layouts must be responsive.
+
+---
+
+# ACCESSIBILITY
+
+Implement:
+
+* Keyboard navigation
+* Focus states
+* Proper contrast
+* ARIA labels
+* Screen reader compatibility
+
+---
+
+# PERFORMANCE
+
+Optimize:
+
+* Lazy loading
+* Memoization
+* Reusable chart components
+* Dashboard rendering performance
+
+---
+
+# AUTONOMOUS EXECUTION
+
+Perform a complete UI audit.
+
+Identify weak pages.
+
+Refactor all dashboards.
+
+Refactor the landing page.
+
+Create reusable design system components.
+
+Improve navigation.
+
+Improve information hierarchy.
+
+Improve visual storytelling.
+
+Improve enterprise credibility.
+
+Generate production-ready code.
+
+Commit changes logically by feature area.
+
+Update documentation where required.
+
+Continue autonomously until the UI resembles a premium enterprise SaaS educational intelligence platform.

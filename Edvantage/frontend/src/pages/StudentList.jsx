@@ -2,33 +2,29 @@ import React, { useState, useEffect } from 'react';
 import {
     Search,
     Filter,
-    MoreVertical,
     UserPlus,
     GraduationCap,
-    Mail,
-    Phone,
     ArrowUpRight,
     CheckSquare,
     Square,
-    Users
+    Users,
+    TrendingUp,
+    Activity,
+    Target,
+    AlertCircle,
+    MoreHorizontal
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../api/axios';
 
-const RiskBadge = ({ risk }) => {
-    const styles = {
-        'At Risk': 'bg-red-500/10 text-red-500 border-red-500/20',
-        'Medium': 'bg-amber-500/10 text-amber-500 border-amber-500/20',
-        'Safe': 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
-        'Low': 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
-    };
-
-    return (
-        <span className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${styles[risk] || styles['Safe']}`}>
-            {risk || 'Safe'}
-        </span>
-    );
-};
+// UI Components
+import Card from '../components/ui/Card';
+import KPICard from '../components/ui/KPICard';
+import Badge from '../components/ui/Badge';
+import RiskBadge from '../components/ui/RiskBadge';
+import Button from '../components/ui/Button';
+import SectionHeader from '../components/ui/SectionHeader';
+import StatGroup from '../components/ui/StatGroup';
 
 const StudentList = () => {
     const [students, setStudents] = useState([]);
@@ -47,12 +43,10 @@ const StudentList = () => {
         try {
             const [studentsRes, usersRes] = await Promise.all([
                 api.get('/students/'),
-                api.get('/users/') // Assuming this returns all users, we filter for supervisors
+                api.get('/users/')
             ]);
 
             setStudents(studentsRes.data);
-
-            // Filter users for supervisors
             const supervisorList = usersRes.data.filter(u => u.role === 'supervisor');
             setSupervisors(supervisorList);
 
@@ -75,14 +69,12 @@ const StudentList = () => {
         if (!selectedSupervisor || selectedStudents.length === 0) return;
 
         try {
-            // Process assignments in parallel
             await Promise.all(selectedStudents.map(studentId =>
                 api.put(`/students/${studentId}/assign-supervisor`, {
                     supervisor_id: selectedSupervisor
                 })
             ));
 
-            // Refresh data
             await fetchData();
             setShowAssignModal(false);
             setSelectedStudents([]);
@@ -94,172 +86,225 @@ const StudentList = () => {
         }
     };
 
+    const atRiskCount = students.filter(s => s.risk_status === 'At Risk' || s.risk_status === 'High').length;
+    const avgGPA = students.length ? students.reduce((acc, s) => acc + (s.gpa || 0), 0) / students.length : 0;
+    const avgAttendance = students.length ? students.reduce((acc, s) => acc + (s.attendance || 0), 0) / students.length : 0;
+
+    const filteredStudents = students.filter(s => 
+        s.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        s.student_id?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     return (
-        <div className="space-y-6">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-3xl font-bold text-white">Students</h1>
-                    <p className="text-slate-400 mt-1">Manage and monitor student records.</p>
-                </div>
+        <div className="space-y-10 animate-in fade-in duration-700 pb-12">
+            <SectionHeader 
+                title="Student Directory" 
+                description="Comprehensive database of all enrolled students and their performance metrics."
+            >
                 <div className="flex gap-2">
                     {selectedStudents.length > 0 && (
-                        <button
+                        <Button
                             onClick={() => setShowAssignModal(true)}
-                            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl transition-all font-medium text-sm animate-in fade-in"
+                            variant="solid"
+                            size="sm"
+                            className="gap-2 bg-indigo-600 hover:bg-indigo-500 animate-in slide-in-from-right-5"
                         >
-                            <Users size={18} />
-                            Assign Supervisor ({selectedStudents.length})
-                        </button>
+                            <Users size={16} />
+                            Assign ({selectedStudents.length})
+                        </Button>
                     )}
-                    <button className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-xl transition-all font-medium text-sm">
-                        <UserPlus size={18} />
-                        Add Student
-                    </button>
+                    <Button size="sm" className="gap-2">
+                        <UserPlus size={16} />
+                        Add New Student
+                    </Button>
                 </div>
-            </div>
+            </SectionHeader>
 
-            {/* Assignment Modal */}
-            {showAssignModal && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-                    <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl w-full max-w-md shadow-2xl">
-                        <h3 className="text-xl font-bold text-white mb-4">Assign Supervisor</h3>
-                        <p className="text-slate-400 mb-4 text-sm">Select a supervisor for the {selectedStudents.length} selected students.</p>
-
-                        <select
-                            value={selectedSupervisor}
-                            onChange={(e) => setSelectedSupervisor(e.target.value)}
-                            className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-white mb-6 focus:ring-2 focus:ring-primary-500 focus:outline-none"
-                        >
-                            <option value="">Select Supervisor...</option>
-                            {supervisors.map(s => (
-                                <option key={s.id} value={s.id}>{s.username} ({s.email})</option>
-                            ))}
-                        </select>
-
-                        <div className="flex justify-end gap-3">
-                            <button
-                                onClick={() => setShowAssignModal(false)}
-                                className="px-4 py-2 text-slate-400 hover:text-white transition-colors"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={handleAssignSupervisor}
-                                disabled={!selectedSupervisor}
-                                className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                Confirm Assignment
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <StatGroup>
+                <KPICard icon={Users} label="Total Students" value={students.length} />
+                <KPICard icon={AlertCircle} label="At-Risk Students" value={atRiskCount} trend={atRiskCount > 0 ? 'up' : 'down'} trendValue={atRiskCount > 5 ? 'High' : 'Normal'} />
+                <KPICard icon={Target} label="Average GPA" value={avgGPA.toFixed(2)} trend="up" trendValue="0.12" />
+                <KPICard icon={Activity} label="Avg Attendance" value={`${avgAttendance.toFixed(1)}%`} />
+            </StatGroup>
 
             <div className="flex flex-col md:flex-row gap-4">
-                <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
+                <div className="relative flex-1 group">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary-400 transition-colors" size={18} />
                     <input
                         type="text"
-                        placeholder="Search by name or student ID..."
-                        className="w-full bg-slate-900 border border-slate-800 rounded-xl py-2 pl-10 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                        placeholder="Search by name, ID or department..."
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-transparent transition-all placeholder:text-slate-600"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
-                <button className="flex items-center gap-2 bg-slate-900 border border-slate-800 text-slate-300 px-4 py-2 rounded-xl hover:bg-slate-800 transition-all text-sm">
+                <Button variant="outline" className="gap-2">
                     <Filter size={18} />
-                    Filters
-                </button>
+                    Advanced Filters
+                </Button>
             </div>
 
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
-                <table className="w-full text-left">
-                    <thead className="bg-slate-800/50 border-b border-slate-800">
-                        <tr>
-                            <th className="px-6 py-4 w-10">
-                                <div className="flex items-center justify-center">
-                                    <span className="sr-only">Select</span>
-                                </div>
-                            </th>
-                            <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Student</th>
-                            <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Department</th>
-                            <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Supervisor</th>
-                            <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">GPA</th>
-                            <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Risk Level</th>
-                            <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-800">
-                        {loading ? (
-                            <tr><td colSpan="7" className="px-6 py-8 text-center text-slate-500">Loading student records...</td></tr>
-                        ) : students.length === 0 ? (
-                            <tr><td colSpan="7" className="px-6 py-8 text-center text-slate-500">No students found.</td></tr>
-                        ) : (
-                            students.filter(s => s.full_name?.toLowerCase().includes(searchTerm.toLowerCase())).map((student) => {
-                                const isSelected = selectedStudents.includes(student.id);
-                                return (
-                                    <tr key={student.id} className={`hover:bg-slate-800/30 transition-colors group ${isSelected ? 'bg-slate-800/40' : ''}`}>
-                                        <td className="px-6 py-4">
-                                            <button
-                                                onClick={() => toggleSelectStudent(student.id)}
-                                                className={`text-slate-500 hover:text-primary-500 transition-colors ${isSelected ? 'text-primary-500' : ''}`}
-                                            >
-                                                {isSelected ? <CheckSquare size={20} /> : <Square size={20} />}
-                                            </button>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="h-10 w-10 bg-slate-800 rounded-lg flex items-center justify-center border border-slate-700">
-                                                    <GraduationCap className="text-slate-400" size={20} />
-                                                </div>
-                                                <div>
-                                                    <Link to={`/dashboard/students/${student.id}`} className="text-sm font-semibold text-white hover:text-primary-500 transition-colors">
-                                                        {student.full_name}
-                                                    </Link>
-                                                    <p className="text-xs text-slate-500">{student.student_id}</p>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <div className="space-y-1">
-                                                <p className="text-xs text-slate-400">{student.department || 'N/A'}</p>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            {student.supervisor ? (
-                                                <div className="flex items-center gap-1.5">
-                                                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
-                                                    <span className="text-sm text-slate-300">{student.supervisor.username}</span>
-                                                </div>
-                                            ) : (
-                                                <span className="text-xs text-slate-600 italic">Unassigned</span>
-                                            )}
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <span className="text-sm font-medium text-white">{student.gpa ? student.gpa.toFixed(2) : '0.00'}</span>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <RiskBadge risk={student.risk_status} />
-                                        </td>
-                                        <td className="px-6 py-4 text-right">
-                                            <div className="flex items-center justify-end gap-2">
-                                                <Link to={`/dashboard/students/${student.id}`} className="p-2 text-slate-500 hover:text-white hover:bg-slate-800 rounded-lg transition-all">
-                                                    <ArrowUpRight size={18} />
-                                                </Link>
-                                                <button className="p-2 text-slate-500 hover:text-white hover:bg-slate-800 rounded-lg transition-all">
-                                                    <MoreVertical size={18} />
+            <Card className="overflow-hidden border-white/5 shadow-2xl">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="bg-white/[0.02] border-b border-white/5">
+                                <th className="px-6 py-5 w-10">
+                                    <div className="flex items-center justify-center">
+                                        <span className="sr-only">Select</span>
+                                    </div>
+                                </th>
+                                <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Student Profile</th>
+                                <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Academic Context</th>
+                                <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Mentorship</th>
+                                <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Performance</th>
+                                <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Risk Status</th>
+                                <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/5">
+                            {loading ? (
+                                <tr><td colSpan="7" className="px-6 py-20 text-center text-slate-500 italic">Synchronizing student records...</td></tr>
+                            ) : filteredStudents.length === 0 ? (
+                                <tr><td colSpan="7" className="px-6 py-20 text-center">
+                                    <div className="flex flex-col items-center gap-2">
+                                        <Users size={40} className="text-slate-700" />
+                                        <p className="text-slate-500 font-medium">No students found matching your criteria.</p>
+                                    </div>
+                                </td></tr>
+                            ) : (
+                                filteredStudents.map((student) => {
+                                    const isSelected = selectedStudents.includes(student.id);
+                                    return (
+                                        <tr key={student.id} className={`hover:bg-white/[0.03] transition-colors group ${isSelected ? 'bg-primary-500/5' : ''}`}>
+                                            <td className="px-6 py-4">
+                                                <button
+                                                    onClick={() => toggleSelectStudent(student.id)}
+                                                    className={`transition-all duration-200 ${isSelected ? 'text-primary-500 scale-110' : 'text-slate-700 hover:text-slate-500'}`}
+                                                >
+                                                    {isSelected ? <CheckSquare size={20} /> : <Square size={20} />}
                                                 </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                )
-                            })
-                        )}
-                    </tbody>
-                </table>
-            </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="h-12 w-12 bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl flex items-center justify-center border border-white/5 shadow-inner group-hover:scale-110 transition-transform">
+                                                        <GraduationCap className="text-slate-500" size={24} />
+                                                    </div>
+                                                    <div>
+                                                        <Link to={`/dashboard/students/${student.id}`} className="text-sm font-black text-white hover:text-primary-400 transition-colors block">
+                                                            {student.full_name}
+                                                        </Link>
+                                                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter mt-0.5">{student.student_id || student.admission_number}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="space-y-1">
+                                                    <p className="text-xs font-bold text-slate-300">{student.department || 'General'}</p>
+                                                    <p className="text-[10px] text-slate-500 uppercase">Year {Math.ceil(student.current_semester / 2)}</p>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                {student.supervisor ? (
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="w-6 h-6 rounded-full bg-primary-500/20 flex items-center justify-center text-[10px] font-bold text-primary-400 border border-primary-500/30">
+                                                            {student.supervisor.username.charAt(0).toUpperCase()}
+                                                        </div>
+                                                        <span className="text-xs font-medium text-slate-400">{student.supervisor.username}</span>
+                                                    </div>
+                                                ) : (
+                                                    <Badge variant="neutral" className="text-[9px] opacity-40">Unassigned</Badge>
+                                                )}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex flex-col gap-1.5">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-sm font-black text-white">{student.gpa?.toFixed(2) || '0.00'}</span>
+                                                        <span className="text-[10px] text-slate-500">GPA</span>
+                                                    </div>
+                                                    <div className="w-16 h-1 bg-white/5 rounded-full overflow-hidden">
+                                                        <div 
+                                                            className={`h-full rounded-full ${student.gpa >= 3.0 ? 'bg-success-500' : student.gpa >= 2.0 ? 'bg-primary-500' : 'bg-risk-critical'}`} 
+                                                            style={{ width: `${(student.gpa / 4.0) * 100}%` }}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <RiskBadge level={student.risk_status} />
+                                            </td>
+                                            <td className="px-6 py-4 text-right">
+                                                <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <Link to={`/dashboard/students/${student.id}`}>
+                                                        <Button variant="ghost" size="sm" className="p-2 h-auto text-slate-500 hover:text-white">
+                                                            <ArrowUpRight size={18} />
+                                                        </Button>
+                                                    </Link>
+                                                    <Button variant="ghost" size="sm" className="p-2 h-auto text-slate-500 hover:text-white">
+                                                        <MoreHorizontal size={18} />
+                                                    </Button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    )
+                                })
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </Card>
+
+            {/* Assignment Modal */}
+            {showAssignModal && (
+                <div className="fixed inset-0 bg-slate-950/40 backdrop-blur-md flex items-center justify-center z-[60] animate-in fade-in duration-300">
+                    <Card className="w-full max-w-md p-8 shadow-2xl border-white/10 animate-in zoom-in-95 duration-300">
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="p-3 bg-indigo-500/10 rounded-2xl border border-indigo-500/20">
+                                <Users className="text-indigo-400" size={24} />
+                            </div>
+                            <div>
+                                <h3 className="text-xl font-black text-white tracking-tight">Assign Supervisor</h3>
+                                <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mt-0.5">{selectedStudents.length} Students Selected</p>
+                            </div>
+                        </div>
+                        
+                        <div className="space-y-4 mb-8">
+                            <label className="block text-xs font-black text-slate-500 uppercase tracking-widest">Select Mentor</label>
+                            <select
+                                value={selectedSupervisor}
+                                onChange={(e) => setSelectedSupervisor(e.target.value)}
+                                className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-white focus:ring-2 focus:ring-primary-500 focus:outline-none transition-all"
+                            >
+                                <option value="" className="bg-slate-900">Choose a supervisor...</option>
+                                {supervisors.map(s => (
+                                    <option key={s.id} value={s.id} className="bg-slate-900">
+                                        {s.username} ({s.email})
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="flex justify-end gap-3">
+                            <Button
+                                variant="ghost"
+                                onClick={() => setShowAssignModal(false)}
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                onClick={handleAssignSupervisor}
+                                disabled={!selectedSupervisor}
+                                className="px-8 shadow-lg shadow-primary-500/20"
+                            >
+                                Confirm Assignment
+                            </Button>
+                        </div>
+                    </Card>
+                </div>
+            )}
         </div>
     );
 };
 
 export default StudentList;
+
