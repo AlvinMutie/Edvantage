@@ -202,22 +202,23 @@ const LandingPage = () => {
           <p className="text-slate-400 max-w-2xl mx-auto text-lg font-medium">Our process turns raw student data into measurable success stories.</p>
         </div>
 
-        <div className="max-w-5xl mx-auto grid md:grid-cols-4 gap-8 relative">
+        <div className="max-w-7xl mx-auto grid md:grid-cols-5 gap-8 relative">
           {[
-            { title: 'Collection', desc: 'Sync LMS and SIS data.', icon: Database },
-            { title: 'Analysis', desc: 'AI-powered risk scoring.', icon: Brain },
-            { title: 'Action', desc: 'Trigger support workflows.', icon: Zap },
-            { title: 'Success', desc: 'Measured student outcomes.', icon: Target },
+            { title: 'Data Sync', desc: 'Aggregate data from LMS, SIS, and engagement logs into a secure hub.', icon: Database },
+            { title: 'AI Audit', desc: 'Neural networks identify subtle patterns of academic and behavioral risk.', icon: Brain },
+            { title: 'Smart Alerts', desc: 'Generate prioritized tasks for advisors the moment risk is detected.', icon: AlertCircle },
+            { title: 'Targeted Action', desc: 'Faculty use AI insights to deliver personalized student support.', icon: Zap },
+            { title: 'Proven Results', desc: 'Measure intervention impact and optimize institutional success.', icon: Target },
           ].map((item, i) => (
             <div key={i} className="relative group text-center space-y-6">
-              <div className="w-20 h-20 mx-auto bg-primary-600/10 rounded-[2rem] border border-primary-500/20 flex items-center justify-center relative z-10 group-hover:bg-primary-600/20 transition-all shadow-lg">
-                <item.icon size={32} className="text-primary-400" />
-                {i < 3 && (
-                  <div className="hidden md:block absolute top-1/2 left-[120%] w-full h-[2px] bg-gradient-to-r from-primary-500/20 to-transparent -translate-y-1/2"></div>
+              <div className="w-16 h-16 mx-auto bg-primary-600/10 rounded-2xl border border-primary-500/20 flex items-center justify-center relative z-10 group-hover:bg-primary-600/20 transition-all shadow-lg group-hover:scale-110 duration-500">
+                <item.icon size={28} className="text-primary-400" />
+                {i < 4 && (
+                  <div className="hidden xl:block absolute top-1/2 left-[130%] w-full h-[1px] bg-white/10 -translate-y-1/2"></div>
                 )}
               </div>
-              <h4 className="text-xl font-bold text-white tracking-tight">{item.title}</h4>
-              <p className="text-slate-400 text-sm leading-relaxed font-medium">{item.desc}</p>
+              <h4 className="text-lg font-bold text-white tracking-tight">{item.title}</h4>
+              <p className="text-slate-400 text-xs leading-relaxed font-medium px-2">{item.desc}</p>
             </div>
           ))}
         </div>
