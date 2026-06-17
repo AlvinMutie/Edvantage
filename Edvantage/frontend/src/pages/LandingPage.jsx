@@ -68,9 +68,9 @@ const LandingPage = () => {
       {/* Navbar */}
       <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${scrolled ? 'bg-slate-950/80 backdrop-blur-xl border-b border-white/5 py-4' : 'bg-transparent py-8'}`}>
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img src={logo} alt="EdVantage" className="h-10 w-10" />
-            <span className="text-2xl font-black tracking-tighter">EdVantage<span className="text-primary-500">.</span></span>
+          <div className="flex items-center gap-4">
+            <img src={logo} alt="EdVantage" className="h-16 w-16 drop-shadow-[0_0_15px_rgba(99,102,241,0.3)]" />
+            <span className="text-3xl font-black tracking-tighter">EdVantage<span className="text-primary-500">.</span></span>
           </div>
           
           <div className="hidden lg:flex items-center gap-8 text-sm font-bold text-slate-400">
@@ -458,9 +458,9 @@ const LandingPage = () => {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-20">
             <div className="col-span-1 md:col-span-2 space-y-6">
-              <div className="flex items-center gap-3">
-                <img src={logo} alt="EdVantage" className="h-10 w-10" />
-                <span className="text-2xl font-black tracking-tighter">EdVantage<span className="text-primary-500">.</span></span>
+              <div className="flex items-center gap-4">
+                <img src={logo} alt="EdVantage" className="h-14 w-14" />
+                <span className="text-3xl font-black tracking-tighter">EdVantage<span className="text-primary-500">.</span></span>
               </div>
               <p className="text-slate-500 max-w-sm font-medium leading-relaxed">
                 Empowering educational institutions with AI-driven insights to foster student success and institutional growth.

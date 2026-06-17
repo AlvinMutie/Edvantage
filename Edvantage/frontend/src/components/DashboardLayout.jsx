@@ -106,20 +106,20 @@ const DashboardLayout = ({ children }) => {
                 }`}
             >
                 {/* Logo Section */}
-                <div className="h-20 flex items-center px-7 gap-4 mb-4">
+                <div className={`h-24 flex items-center transition-all duration-500 ${isSidebarCollapsed ? 'justify-center px-0' : 'px-7 gap-4'} mb-4`}>
                     <div className="relative group flex-shrink-0">
-                        <div className="absolute inset-0 bg-primary-500/30 blur-xl rounded-full scale-0 group-hover:scale-150 transition-transform duration-700"></div>
-                        <div className="relative z-10 w-10 h-10 rounded-2xl bg-gradient-to-br from-primary-500 to-indigo-600 p-2 shadow-lg shadow-primary-500/20">
+                        <div className="absolute inset-0 bg-primary-500/30 blur-2xl rounded-full scale-0 group-hover:scale-150 transition-transform duration-700"></div>
+                        <div className={`relative z-10 ${isSidebarCollapsed ? 'w-12 h-12' : 'w-14 h-14'} rounded-2xl bg-white/5 p-2 shadow-xl border border-white/10 group-hover:border-primary-500/50 transition-all duration-500`}>
                             <img 
                                 src={schoolSettings.logo || logo} 
                                 alt="Logo" 
-                                className="w-full h-full object-contain brightness-0 invert" 
+                                className="w-full h-full object-contain" 
                             />
                         </div>
                     </div>
                     {!isSidebarCollapsed && (
                         <div className="flex flex-col min-w-0 animate-in fade-in slide-in-from-left-4 duration-500">
-                            <span className="font-black text-white truncate text-xl tracking-tighter leading-none mb-1">
+                            <span className="font-black text-white truncate text-2xl tracking-tighter leading-none mb-1">
                                 {schoolSettings.name}
                             </span>
                             <div className="flex items-center gap-1.5">
